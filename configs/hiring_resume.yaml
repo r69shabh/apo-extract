@@ -1,0 +1,61 @@
+run_id: resume-srpbo-v1
+seed: 42
+
+dataset:
+  name: hiring/resume
+  root_dir: data/extract-bench
+  schema_path: data/extract-bench/dataset/hiring/resume/resume-schema.json
+  documents_glob: data/extract-bench/dataset/hiring/resume/pdf+gold/*.pdf
+  gold_dir: data/extract-bench/dataset/hiring/resume/pdf+gold
+  split_policy:
+    seed: 42
+    train_ratio: 0.30
+    val_ratio: 0.40
+    test_ratio: 0.30
+
+scoring:
+  engine: extract_bench_compliant          # or "your.module:factory"
+  primary_metric: overall_micro_f1
+  array_alignment_policy: hungarian_plus_llm_cache
+  number_default_tolerance: 0.001
+  semantic_match_threshold: 0.70
+  judge_model: openrouter/google/gemini-2.5-flash-lite  # gemini family (closest parity); OR paid tier has no daily cap
+  enable_llm_judge: false
+  cache_path: runs/cache/scoring_cache.sqlite
+
+llms:
+  extractor:
+    provider: openrouter
+    model: google/gemini-2.5-flash-lite  # gemini family; OR inline-PDF needs $0.50 balance, so page images
+    temperature: 0.0
+    pdf_mode: images
+  optimizer_mutator:
+    provider: openrouter
+    model: google/gemini-2.5-flash-lite
+    temperature: 1.0
+  scoring_judge:
+    provider: openrouter
+    model: google/gemini-2.5-flash-lite
+    temperature: 0.0
+
+seed_prompt:
+  path: configs/prompts/seed_generic_extraction.txt
+
+budget:
+  max_iterations: 5   # reduced from 12: free-tier daily quota exhausted at iter 5; resume now finalizes (test eval). Deviation noted in REPORT.md
+  max_cost_usd: 8.0
+  max_total_tokens: 4000000
+  max_wall_clock_seconds: 7200
+
+optimizer:
+  strategy: subtree_pareto_beam
+  beam_width: 3
+  candidates_per_iteration: 2
+  min_val_improvement: 0.005
+  stage1_max_train_regression: 0.02
+  pareto_aggregate_tolerance: 0.03
+  stall_patience: 2
+  duplicate_similarity: 0.92
+  enable_subtree_rollback: false  # skipped for the quota-bound finalization pass; noted in REPORT.md
+  extraction_mode: single_call
+  chunk_threshold_fields: 60

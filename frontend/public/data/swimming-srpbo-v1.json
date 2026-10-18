@@ -1,0 +1,4486 @@
+{
+  "run_id": "swimming-srpbo-v1",
+  "exported_at": 1792332838.035778,
+  "run": {
+    "run_id": "swimming-srpbo-v1",
+    "config_hash": "4ce276c691b7fbac6cb367b439e54593492fd576ecbe2ed6d135307bf4d73166",
+    "config_path": "",
+    "status": "completed",
+    "budget_spent_tokens": 282739,
+    "budget_spent_usd": 0.0,
+    "started_at": 1792313010.286379,
+    "current_iteration": 5,
+    "stall": 2,
+    "best_candidate_id": "c5_0"
+  },
+  "config": {
+    "run_id": "swimming-srpbo-v1",
+    "seed": 42,
+    "dataset": {
+      "name": "sport/swimming",
+      "root_dir": "data/extract-bench",
+      "schema_path": "data/extract-bench/dataset/sport/swimming/swimming-schema.json",
+      "documents_glob": "data/extract-bench/dataset/sport/swimming/pdf+gold/*.pdf",
+      "gold_dir": "data/extract-bench/dataset/sport/swimming/pdf+gold",
+      "gold_match_pattern": "{doc_stem}.gold.json",
+      "split_policy": {
+        "seed": 42,
+        "train_ratio": 0.3,
+        "val_ratio": 0.4,
+        "test_ratio": 0.3
+      }
+    },
+    "scoring": {
+      "engine": "extract_bench_compliant",
+      "primary_metric": "overall_micro_f1",
+      "array_alignment_policy": "hungarian_plus_llm_cache",
+      "number_default_tolerance": 0.001,
+      "semantic_match_threshold": 0.7,
+      "judge_model": "groq/qwen/qwen3.8-27b",
+      "array_match_threshold": 0.5,
+      "enable_llm_judge": false,
+      "cache_path": "runs/cache/scoring_cache.sqlite"
+    },
+    "llms": {
+      "extractor": {
+        "provider": "groq",
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 0.0,
+        "max_output_tokens": 3000,
+        "litellm_model": null,
+        "pdf_mode": "text"
+      },
+      "optimizer_critic": null,
+      "optimizer_mutator": {
+        "provider": "groq",
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 1.0,
+        "max_output_tokens": 2000,
+        "litellm_model": null,
+        "pdf_mode": null
+      },
+      "scoring_judge": {
+        "provider": "groq",
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 0.0,
+        "max_output_tokens": 1000,
+        "litellm_model": null,
+        "pdf_mode": null
+      }
+    },
+    "seed_prompt": {
+      "path": "configs/prompts/seed_generic_extraction.txt"
+    },
+    "budget": {
+      "max_iterations": 12,
+      "max_cost_usd": 8.0,
+      "max_total_tokens": 4000000,
+      "max_wall_clock_seconds": 3600
+    },
+    "optimizer": {
+      "strategy": "subtree_pareto_beam",
+      "beam_width": 3,
+      "candidates_per_iteration": 2,
+      "min_val_improvement": 0.005,
+      "stage1_max_train_regression": 0.02,
+      "pareto_aggregate_tolerance": 0.03,
+      "stall_patience": 2,
+      "duplicate_similarity": 0.92,
+      "enable_subtree_rollback": true,
+      "rollback_improve_threshold": 0.05,
+      "rollback_regress_threshold": -0.02,
+      "extraction_mode": "single_call",
+      "chunk_threshold_fields": 60
+    },
+    "config_path": "configs/swimming.yaml"
+  },
+  "dataset": {
+    "name": "sport/swimming",
+    "root_dir": "data/extract-bench",
+    "schema_path": "data/extract-bench/dataset/sport/swimming/swimming-schema.json",
+    "documents_glob": "data/extract-bench/dataset/sport/swimming/pdf+gold/*.pdf",
+    "gold_dir": "data/extract-bench/dataset/sport/swimming/pdf+gold",
+    "gold_match_pattern": "{doc_stem}.gold.json",
+    "split_policy": {
+      "seed": 42,
+      "train_ratio": 0.3,
+      "val_ratio": 0.4,
+      "test_ratio": 0.3
+    },
+    "n_documents": 5,
+    "schema_fields": [
+      "championship",
+      "event_details",
+      "age_groups"
+    ],
+    "split": {
+      "train": [
+        "ma_2023_sw_M-table2",
+        "ma_2023_sw_M-table4"
+      ],
+      "val": [
+        "ma_2023_sw_M-table3",
+        "ma_2023_sw_M-table5"
+      ],
+      "test": [
+        "ma_2023_sw_M-table1"
+      ]
+    }
+  },
+  "seed": {
+    "artifact": {
+      "artifact_id": "root",
+      "parent_ids": [],
+      "generation": 0,
+      "global_preamble": "You are a precise structured-data extraction engine.\n\nYou will be shown one document and a JSON schema. Extract exactly one JSON object\nthat conforms to the schema.\n\nRules:\n1. Faithfulness: every value must come from the document text. Never invent data.\n2. Completeness: fill every required field. If the document truly lacks a value,\n   use null; do not omit required keys.\n3. Verbatim fidelity: copy strings, numbers, and dates as written (same wording,\n   units, and digit grouping). Do not paraphrase, translate, round, or normalize.\n4. Arrays: include every element the document supports, in document order.\n5. Enums: only exact allowed values; otherwise null.\n6. Output: return only the JSON object, with no markdown fences or commentary.",
+      "formatting_and_null_policy": "Output contract:\n- Return exactly one JSON object and nothing else (no markdown fences, no commentary).\n- Use null for any field that is not clearly present in the document; never guess.\n- Numbers: plain JSON numbers without currency symbols or thousands separators.\n- Dates: copy the document's date string verbatim; do not reformat.\n- Strings: extract verbatim text; do not paraphrase or summarize.\n- Arrays: include every element the schema asks for, in document order.\n- Enums: only the exact allowed values; otherwise null.",
+      "subtree_directives": {
+        "$.age_groups": "",
+        "$.championship": "",
+        "$.event_details": ""
+      },
+      "verification_checklist": ""
+    },
+    "text": "You are a precise structured-data extraction engine.\n\nYou will be shown one document and a JSON schema. Extract exactly one JSON object\nthat conforms to the schema.\n\nRules:\n1. Faithfulness: every value must come from the document text. Never invent data.\n2. Completeness: fill every required field. If the document truly lacks a value,\n   use null; do not omit required keys.\n3. Verbatim fidelity: copy strings, numbers, and dates as written (same wording,\n   units, and digit grouping). Do not paraphrase, translate, round, or normalize.\n4. Arrays: include every element the document supports, in document order.\n5. Enums: only exact allowed values; otherwise null.\n6. Output: return only the JSON object, with no markdown fences or commentary.\n\nOutput contract:\n- Return exactly one JSON object and nothing else (no markdown fences, no commentary).\n- Use null for any field that is not clearly present in the document; never guess.\n- Numbers: plain JSON numbers without currency symbols or thousands separators.\n- Dates: copy the document's date string verbatim; do not reformat.\n- Strings: extract verbatim text; do not paraphrase or summarize.\n- Arrays: include every element the schema asks for, in document order.\n- Enums: only the exact allowed values; otherwise null."
+  },
+  "best": {
+    "candidate_id": "c5_0",
+    "artifact": {
+      "artifact_id": "c5_0",
+      "parent_ids": [
+        "c5_0"
+      ],
+      "generation": 2,
+      "global_preamble": "You are a precise structured-data extraction engine.\n\nYou will be shown one document and a JSON schema. Extract exactly one JSON object\nthat conforms to the schema.\n\nRules:\n1. Faithfulness: every value must come from the document text. Never invent data.\n2. Completeness: fill every required field. If the document truly lacks a value,\n   use null; do not omit required keys.\n3. Verbatim fidelity: copy strings, numbers, and dates as written (same wording,\n   units, and digit grouping). Do not paraphrase, translate, round, or normalize.\n4. Arrays: include every element the document supports, in document order.\n5. Enums: only exact allowed values; otherwise null.\n6. Output: return only the JSON object, with no markdown fences or commentary.",
+      "formatting_and_null_policy": "Output contract:\n- Return exactly one JSON object and nothing else (no markdown fences, no commentary).\n- Use null for any field that is not clearly present in the document; never guess.\n- Numbers: plain JSON numbers without currency symbols or thousands separators.\n- Dates: copy the document's date string verbatim; do not reformat.\n- Strings: extract verbatim text; do not paraphrase or summarize.\n- Arrays: include every element the schema asks for, in document order.\n- Enums: only the exact allowed values; otherwise null.",
+      "subtree_directives": {
+        "$.age_groups": "CRITICAL: For the 'results' array, ensure strict 1:1 mapping between each row in the document table and an object in the array. Do not skip rows where specific attributes (like 'records') are missing in the source; instead, represent missing data as null (e.g., \"records\": null) to maintain array length and index alignment.\nCRITICAL: Verify that the 'results' array index matches the physical table row index exactly. Do not use the 'team' or 'time' field values to determine row identity; use row position. If the source table is multi-column (e.g., Team/Name/Time/Records), ensure every cell in the row is mapped to the corresponding field object. If a cell is empty, set the field to null but keep the object in the array at the correct index.",
+        "$.championship": "",
+        "$.event_details": ""
+      },
+      "verification_checklist": ""
+    },
+    "text": "You are a precise structured-data extraction engine.\n\nYou will be shown one document and a JSON schema. Extract exactly one JSON object\nthat conforms to the schema.\n\nRules:\n1. Faithfulness: every value must come from the document text. Never invent data.\n2. Completeness: fill every required field. If the document truly lacks a value,\n   use null; do not omit required keys.\n3. Verbatim fidelity: copy strings, numbers, and dates as written (same wording,\n   units, and digit grouping). Do not paraphrase, translate, round, or normalize.\n4. Arrays: include every element the document supports, in document order.\n5. Enums: only exact allowed values; otherwise null.\n6. Output: return only the JSON object, with no markdown fences or commentary.\n\nOutput contract:\n- Return exactly one JSON object and nothing else (no markdown fences, no commentary).\n- Use null for any field that is not clearly present in the document; never guess.\n- Numbers: plain JSON numbers without currency symbols or thousands separators.\n- Dates: copy the document's date string verbatim; do not reformat.\n- Strings: extract verbatim text; do not paraphrase or summarize.\n- Arrays: include every element the schema asks for, in document order.\n- Enums: only the exact allowed values; otherwise null.\n\n=== FIELD-SPECIFIC GUIDANCE ===\n### $.age_groups\nCRITICAL: For the 'results' array, ensure strict 1:1 mapping between each row in the document table and an object in the array. Do not skip rows where specific attributes (like 'records') are missing in the source; instead, represent missing data as null (e.g., \"records\": null) to maintain array length and index alignment.\nCRITICAL: Verify that the 'results' array index matches the physical table row index exactly. Do not use the 'team' or 'time' field values to determine row identity; use row position. If the source table is multi-column (e.g., Team/Name/Time/Records), ensure every cell in the row is mapped to the corresponding field object. If a cell is empty, set the field to null but keep the object in the array at the correct index."
+  },
+  "root_val": {
+    "f1": 0.9865344426168283,
+    "aggregate_f1": 0.9626714999999999,
+    "json_valid_rate": 1.0,
+    "per_doc": {
+      "ma_2023_sw_M-table3": {
+        "micro_f1": 0.9925925925925926,
+        "macro_subtree_f1": 0.9973753333333333,
+        "precision": 0.9852941176470589,
+        "recall": 1.0,
+        "tp": 67.0,
+        "fp": 1.0,
+        "fn": 0.0,
+        "mean_metric_score": 1.0,
+        "n_scored_nodes": 5,
+        "json_valid": true,
+        "nodes": {
+          "$.championship": {
+            "path": "$.championship",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "extracted": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.sex": {
+            "path": "$.event_details.sex",
+            "metric_id": "string_case_insensitive",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "MEN",
+            "extracted": "MEN",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.length": {
+            "path": "$.event_details.length",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "50m",
+            "extracted": "50m",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.category": {
+            "path": "$.event_details.category",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Breaststroke",
+            "extracted": "Breaststroke",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups": {
+            "path": "$.age_groups",
+            "metric_id": "array_llm",
+            "score": 1.0,
+            "passed": true,
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": [
+              {
+                "age_group": "95-99",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Kazuo YASUIKE",
+                      "country": "JPN",
+                      "year_birth": 1928,
+                      "team": "OISO MSC"
+                    },
+                    "time": "1:29.46"
+                  }
+                ]
+              },
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Yoichiro ARAI",
+                      "country": "JPN",
+                      "year_birth": 1931,
+                      "team": "BIG S SENDAIIZUMI"
+                    },
+                    "time": "1:09.12"
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Kiyoshi FUJII",
+                      "country": "JPN",
+                      "year_birth": 1931,
+                      "team": "RED SHAKE"
+                    },
+                    "time": "1:16.36"
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Tony GOODWIN",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Manly Masters Swimming Club"
+                    },
+                    "time": "45.42"
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Hirofumi HOSOTANI",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "UP SIDE"
+                    },
+                    "time": "50.85"
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Yoshikatsu OSHIKAWA",
+                      "country": "JPN",
+                      "year_birth": 1934,
+                      "team": "RN MIYAZAKI"
+                    },
+                    "time": "55.88"
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Shigeru INOUE",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "HIROSHIMA SEIFU SHINTO"
+                    },
+                    "time": "1:00.78"
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Lieh Yung CHI",
+                      "country": "HKG",
+                      "year_birth": 1934,
+                      "team": "Sword Fish Club"
+                    },
+                    "time": "1:08.78"
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Iuliu Eugen Lehel FOLLERT",
+                      "country": "ROU",
+                      "year_birth": 1938,
+                      "team": "Tribeach Brasov"
+                    },
+                    "time": "1:13.97"
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Kazuo HOSOYAMADA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "RE-S AC"
+                    },
+                    "time": "DNS"
+                  }
+                ]
+              }
+            ],
+            "extracted": [
+              {
+                "age_group": "95-99",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "1:29.46",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kazuo YASUIKE",
+                      "country": "JPN",
+                      "year_birth": 1928,
+                      "team": "OISO MSC"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "1:09.12",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Yoichiro ARAI",
+                      "country": "JPN",
+                      "year_birth": 1931,
+                      "team": "BIG S SENDAIIZUMI"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "1:16.36",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kiyoshi FUJII",
+                      "country": "JPN",
+                      "year_birth": 1931,
+                      "team": "RED SHAKE"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "45.42",
+                    "records": [
+                      "WR",
+                      "CR"
+                    ],
+                    "athlete_details": {
+                      "athlete": "Tony GOODWIN",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Manly Masters Swimming Club"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "50.85",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Hirofumi HOSOTANI",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "UP SIDE"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "55.88",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Yoshikatsu OSHIKAWA",
+                      "country": "JPN",
+                      "year_birth": 1934,
+                      "team": "RN MIYAZAKI"
+                    }
+                  },
+                  {
+                    "rank": 4,
+                    "time": "1:00.78",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Shigeru INOUE",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "HIROSHIMA SEIFU SHINTO"
+                    }
+                  },
+                  {
+                    "rank": 5,
+                    "time": "1:08.78",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Lieh Yung CHI",
+                      "country": "HKG",
+                      "year_birth": 1934,
+                      "team": "Sword Fish Club"
+                    }
+                  },
+                  {
+                    "rank": 6,
+                    "time": "1:13.97",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Iuliu Eugen Lehel FOLLERT",
+                      "country": "ROU",
+                      "year_birth": 1938,
+                      "team": "Tribeach Brasov"
+                    }
+                  },
+                  {
+                    "rank": "NA",
+                    "time": "DNS",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kazuo HOSOYAMADA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "RE-S AC"
+                    }
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups[*].age_group": {
+            "path": "$.age_groups[*].age_group",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 3.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "85-89",
+            "extracted": "85-89",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].rank": {
+            "path": "$.age_groups[*].results[*].rank",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "NA",
+            "extracted": "NA",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].time": {
+            "path": "$.age_groups[*].results[*].time",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "DNS",
+            "extracted": "DNS",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].records": {
+            "path": "$.age_groups[*].results[*].records",
+            "metric_id": "array_llm",
+            "score": 0.0,
+            "passed": false,
+            "tp": 0.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "gold": null,
+            "extracted": null,
+            "reason": "both_absent",
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "path": "$.age_groups[*].results[*].athlete_details.athlete",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Kazuo HOSOYAMADA",
+            "extracted": "Kazuo HOSOYAMADA",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "path": "$.age_groups[*].results[*].athlete_details.country",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "JPN",
+            "extracted": "JPN",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "path": "$.age_groups[*].results[*].athlete_details.year_birth",
+            "metric_id": "integer_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": 1938,
+            "extracted": 1938,
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "path": "$.age_groups[*].results[*].athlete_details.team",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "RE-S AC",
+            "extracted": "RE-S AC",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          }
+        },
+        "subtree": {
+          "$": {
+            "tp": 67.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 12.0,
+            "count": 13,
+            "precision": 0.985294,
+            "recall": 1.0,
+            "f1": 0.992593,
+            "mean_score": 0.923077
+          },
+          "$.championship": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details": {
+            "tp": 3.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 3.0,
+            "count": 3,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.sex": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.length": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.category": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups": {
+            "tp": 63.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 8.0,
+            "count": 9,
+            "precision": 0.984375,
+            "recall": 1.0,
+            "f1": 0.992126,
+            "mean_score": 0.888889
+          },
+          "$.age_groups[*]": {
+            "tp": 63.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 7.0,
+            "count": 8,
+            "precision": 0.984375,
+            "recall": 1.0,
+            "f1": 0.992126,
+            "mean_score": 0.875
+          },
+          "$.age_groups[*].age_group": {
+            "tp": 3.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results": {
+            "tp": 60.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 6.0,
+            "count": 7,
+            "precision": 0.983607,
+            "recall": 1.0,
+            "f1": 0.991736,
+            "mean_score": 0.857143
+          },
+          "$.age_groups[*].results[*]": {
+            "tp": 60.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 6.0,
+            "count": 7,
+            "precision": 0.983607,
+            "recall": 1.0,
+            "f1": 0.991736,
+            "mean_score": 0.857143
+          },
+          "$.age_groups[*].results[*].rank": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].time": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].records": {
+            "tp": 0.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 0.0,
+            "count": 1,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "mean_score": 0.0
+          },
+          "$.age_groups[*].results[*].athlete_details": {
+            "tp": 40.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 4.0,
+            "count": 4,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "tp": 10.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          }
+        },
+        "errors": [
+          {
+            "path": "$.age_groups[*].results[*].records",
+            "metric_id": "array_llm",
+            "kind": "array_item_mismatch",
+            "gold": null,
+            "extracted": null,
+            "reason": "both_absent",
+            "error": null,
+            "score": null,
+            "fp": 1.0,
+            "fn": 0.0
+          }
+        ]
+      },
+      "ma_2023_sw_M-table5": {
+        "micro_f1": 0.9804762926410642,
+        "macro_subtree_f1": 0.9279676666666666,
+        "precision": 0.9921841076856275,
+        "recall": 0.9690415606446141,
+        "tp": 126.94444444444444,
+        "fp": 1.0,
+        "fn": 4.055555555555555,
+        "mean_metric_score": 0.8,
+        "n_scored_nodes": 5,
+        "json_valid": true,
+        "nodes": {
+          "$.championship": {
+            "path": "$.championship",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "extracted": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.sex": {
+            "path": "$.event_details.sex",
+            "metric_id": "string_case_insensitive",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "MEN",
+            "extracted": "MEN",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.length": {
+            "path": "$.event_details.length",
+            "metric_id": "string_exact",
+            "score": 0.0,
+            "passed": false,
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 1.0,
+            "gold": "50m",
+            "extracted": "200m",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.category": {
+            "path": "$.event_details.category",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Individual Medley",
+            "extracted": "Individual Medley",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups": {
+            "path": "$.age_groups",
+            "metric_id": "array_llm",
+            "score": 1.0,
+            "passed": true,
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    },
+                    "time": "DNS"
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Tony GOODWIN",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Manly Masters Swimming Club"
+                    },
+                    "time": "3:56.67"
+                  }
+                ]
+              },
+              {
+                "age_group": "80-84",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Gershon SHEFA",
+                      "country": "ISR",
+                      "year_birth": 1943,
+                      "team": "Aquatikim"
+                    },
+                    "time": "3:21.37"
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Koutarou YUGAWA",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "NAGASAKISC"
+                    },
+                    "time": "3:42.96"
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Kihei YOSHIMURA",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "ISLAND TAKATSUKI"
+                    },
+                    "time": "3:43.02"
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Takeki UESUGI",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "TEAM SOURIN"
+                    },
+                    "time": "3:43.35"
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Takahiro TAKIMOTO",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "RILA HITACHI"
+                    },
+                    "time": "3:53.12"
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Joaquin CANALES",
+                      "country": "ESP",
+                      "year_birth": 1940,
+                      "team": "R.C. MEDITERRANEO"
+                    },
+                    "time": "4:01.83"
+                  },
+                  {
+                    "rank": 7,
+                    "athlete_details": {
+                      "athlete": "Zeev SHABTAY",
+                      "country": "ISR",
+                      "year_birth": 1941,
+                      "team": "Aquatikim"
+                    },
+                    "time": "4:02.27"
+                  },
+                  {
+                    "rank": 8,
+                    "athlete_details": {
+                      "athlete": "Masamichi OGAWA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "KONAMI IKOMA"
+                    },
+                    "time": "4:16.93"
+                  },
+                  {
+                    "rank": 9,
+                    "athlete_details": {
+                      "athlete": "Alfred Otto SEEGER",
+                      "country": "GER",
+                      "year_birth": 1940,
+                      "team": "TSV Lindau"
+                    },
+                    "time": "4:23.51"
+                  },
+                  {
+                    "rank": 10,
+                    "athlete_details": {
+                      "athlete": "Masaji NAGASHIMA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "BEAU SIRENE"
+                    },
+                    "time": "4:35.59"
+                  },
+                  {
+                    "rank": 11,
+                    "athlete_details": {
+                      "athlete": "Takashi OKABE",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "WINGS"
+                    },
+                    "time": "4:45.08"
+                  },
+                  {
+                    "rank": 12,
+                    "athlete_details": {
+                      "athlete": "Michael READ",
+                      "country": "GBR",
+                      "year_birth": 1941,
+                      "team": "Brighton SC"
+                    },
+                    "time": "5:00.41"
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Hisayuki SHIMOMURA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "SPL KANI"
+                    },
+                    "time": "DNS"
+                  }
+                ]
+              },
+              {
+                "age_group": "75-79",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Osamu KUMAGAI",
+                      "country": "JPN",
+                      "year_birth": 1947,
+                      "team": "FITTA MATSUYAMA"
+                    },
+                    "time": "3:20.20"
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Michael MACMANUS",
+                      "country": "JPN",
+                      "year_birth": 1946,
+                      "team": "ITOMAN MUKAIYAMA"
+                    },
+                    "time": "3:31.67"
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Yuichi SHIMOTSU",
+                      "country": "JPN",
+                      "year_birth": 1944,
+                      "team": "PAL OTA"
+                    },
+                    "time": "3:43.35"
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Fernando CANEPA BUSTAMANTE",
+                      "country": "PER",
+                      "year_birth": 1947,
+                      "team": "PERU MASTER \u2013 Swim"
+                    },
+                    "time": "3:53.54"
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Kenji HIROBAYASHI",
+                      "country": "JPN",
+                      "year_birth": 1948,
+                      "team": "KYUSHU UNIVERSITY MASTERS"
+                    },
+                    "time": "4:14.29"
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Morrie CHIANG",
+                      "country": "TPE",
+                      "year_birth": 1947,
+                      "team": "Chinese Taipei Master Swim"
+                    },
+                    "time": "4:23.36"
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "David EDSALL",
+                      "country": "USA",
+                      "year_birth": 1948,
+                      "team": "New England Masters Swim"
+                    },
+                    "time": "DSQ"
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Bob WHITE",
+                      "country": "USA",
+                      "year_birth": 1948,
+                      "team": "Puget Sound Masters"
+                    },
+                    "time": "DNS"
+                  }
+                ]
+              }
+            ],
+            "extracted": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": "NA",
+                    "time": "DNS",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "3:56.67",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Tony GOODWIN",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Manly Masters Swimming Club"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "80-84",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "3:21.37",
+                    "records": [
+                      "CR"
+                    ],
+                    "athlete_details": {
+                      "athlete": "Gershon SHEFA",
+                      "country": "ISR",
+                      "year_birth": 1943,
+                      "team": "Aquatikim"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "3:42.96",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Koutarou YUGAWA",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "NAGASAKISC"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "3:43.02",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kihei YOSHIMURA",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "ISLAND TAKATSUKI"
+                    }
+                  },
+                  {
+                    "rank": 4,
+                    "time": "3:43.35",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Takeki UESUGI",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "TEAM SOURIN"
+                    }
+                  },
+                  {
+                    "rank": 5,
+                    "time": "3:53.12",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Takahiro TAKIMOTO",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "RILA HITACHI"
+                    }
+                  },
+                  {
+                    "rank": 6,
+                    "time": "4:01.83",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Joaquin CANALES",
+                      "country": "ESP",
+                      "year_birth": 1940,
+                      "team": "R.C. MEDITERRANEO"
+                    }
+                  },
+                  {
+                    "rank": 7,
+                    "time": "4:02.27",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Zeev SHABTAY",
+                      "country": "ISR",
+                      "year_birth": 1941,
+                      "team": "Aquatikim"
+                    }
+                  },
+                  {
+                    "rank": 8,
+                    "time": "4:16.93",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Masamichi OGAWA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "KONAMI IKOMA"
+                    }
+                  },
+                  {
+                    "rank": 9,
+                    "time": "4:23.51",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Alfred Otto SEEGER",
+                      "country": "GER",
+                      "year_birth": 1940,
+                      "team": "TSV Lindau"
+                    }
+                  },
+                  {
+                    "rank": 10,
+                    "time": "4:35.59",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Masaji NAGASHIMA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "BEAU SIRENE"
+                    }
+                  },
+                  {
+                    "rank": 11,
+                    "time": "4:45.08",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Takashi OKABE",
+                      "country": "JPN",
+                      "year_birth": 1941,
+                      "team": "WINGS"
+                    }
+                  },
+                  {
+                    "rank": 12,
+                    "time": "5:00.41",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Michael READ",
+                      "country": "GBR",
+                      "year_birth": 1941,
+                      "team": "Brighton SC"
+                    }
+                  },
+                  {
+                    "rank": "NA",
+                    "time": "DNS",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Hisayuki SHIMOMURA",
+                      "country": "JPN",
+                      "year_birth": 1942,
+                      "team": "SPL KANI"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "75-79",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "3:20.20",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Osamu KUMAGAI",
+                      "country": "JPN",
+                      "year_birth": 1947,
+                      "team": "FITTA MATSUYAMA"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "3:31.67",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Michael MACMANUS",
+                      "country": "JPN",
+                      "year_birth": 1946,
+                      "team": "ITOMAN MUKAIYAMA"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "3:43.35",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Yuichi SHIMOTSU",
+                      "country": "JPN",
+                      "year_birth": 1944,
+                      "team": "PAL OTA"
+                    }
+                  },
+                  {
+                    "rank": 4,
+                    "time": "3:53.54",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Fernando CANEPA BUSTAMANTE",
+                      "country": "PER",
+                      "year_birth": 1947,
+                      "team": "PERU MASTER - Swim"
+                    }
+                  },
+                  {
+                    "rank": 5,
+                    "time": "4:14.29",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kenji HIROBAYASHI",
+                      "country": "JPN",
+                      "year_birth": 1948,
+                      "team": "KYUSHU UNIVERSITY MASTERS"
+                    }
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups[*].age_group": {
+            "path": "$.age_groups[*].age_group",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 4.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "75-79",
+            "extracted": "75-79",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].rank": {
+            "path": "$.age_groups[*].results[*].rank",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": 5,
+            "extracted": 5,
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].time": {
+            "path": "$.age_groups[*].results[*].time",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "4:14.29",
+            "extracted": "4:14.29",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].records": {
+            "path": "$.age_groups[*].results[*].records",
+            "metric_id": "array_llm",
+            "score": 0.0,
+            "passed": false,
+            "tp": 0.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "gold": null,
+            "extracted": null,
+            "reason": "both_absent",
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "path": "$.age_groups[*].results[*].athlete_details.athlete",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Kenji HIROBAYASHI",
+            "extracted": "Kenji HIROBAYASHI",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "path": "$.age_groups[*].results[*].athlete_details.country",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "JPN",
+            "extracted": "JPN",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "path": "$.age_groups[*].results[*].athlete_details.year_birth",
+            "metric_id": "integer_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": 1948,
+            "extracted": 1948,
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "path": "$.age_groups[*].results[*].athlete_details.team",
+            "metric_id": "string_fuzzy",
+            "score": 0.9986091794158553,
+            "passed": false,
+            "tp": 19.944444444444443,
+            "fp": 0.0,
+            "fn": 0.05555555555555558,
+            "gold": "PAL OTA",
+            "extracted": "PAL OTA",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results": {
+            "path": "$.age_groups[*].results",
+            "metric_id": "array_llm",
+            "score": 0.0,
+            "passed": false,
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 3.0,
+            "gold": [
+              {
+                "rank": 1,
+                "athlete_details": {
+                  "athlete": "Osamu KUMAGAI",
+                  "country": "JPN",
+                  "year_birth": 1947,
+                  "team": "FITTA MATSUYAMA"
+                },
+                "time": "3:20.20"
+              },
+              {
+                "rank": 2,
+                "athlete_details": {
+                  "athlete": "Michael MACMANUS",
+                  "country": "JPN",
+                  "year_birth": 1946,
+                  "team": "ITOMAN MUKAIYAMA"
+                },
+                "time": "3:31.67"
+              },
+              {
+                "rank": 3,
+                "athlete_details": {
+                  "athlete": "Yuichi SHIMOTSU",
+                  "country": "JPN",
+                  "year_birth": 1944,
+                  "team": "PAL OTA"
+                },
+                "time": "3:43.35"
+              },
+              {
+                "rank": 4,
+                "athlete_details": {
+                  "athlete": "Fernando CANEPA BUSTAMANTE",
+                  "country": "PER",
+                  "year_birth": 1947,
+                  "team": "PERU MASTER \u2013 Swim"
+                },
+                "time": "3:53.54"
+              },
+              {
+                "rank": 5,
+                "athlete_details": {
+                  "athlete": "Kenji HIROBAYASHI",
+                  "country": "JPN",
+                  "year_birth": 1948,
+                  "team": "KYUSHU UNIVERSITY MASTERS"
+                },
+                "time": "4:14.29"
+              },
+              {
+                "rank": 6,
+                "athlete_details": {
+                  "athlete": "Morrie CHIANG",
+                  "country": "TPE",
+                  "year_birth": 1947,
+                  "team": "Chinese Taipei Master Swim"
+                },
+                "time": "4:23.36"
+              },
+              {
+                "rank": "NA",
+                "athlete_details": {
+                  "athlete": "David EDSALL",
+                  "country": "USA",
+                  "year_birth": 1948,
+                  "team": "New England Masters Swim"
+                },
+                "time": "DSQ"
+              },
+              {
+                "rank": "NA",
+                "athlete_details": {
+                  "athlete": "Bob WHITE",
+                  "country": "USA",
+                  "year_birth": 1948,
+                  "team": "Puget Sound Masters"
+                },
+                "time": "DNS"
+              }
+            ],
+            "extracted": [
+              {
+                "rank": 1,
+                "time": "3:20.20",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Osamu KUMAGAI",
+                  "country": "JPN",
+                  "year_birth": 1947,
+                  "team": "FITTA MATSUYAMA"
+                }
+              },
+              {
+                "rank": 2,
+                "time": "3:31.67",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Michael MACMANUS",
+                  "country": "JPN",
+                  "year_birth": 1946,
+                  "team": "ITOMAN MUKAIYAMA"
+                }
+              },
+              {
+                "rank": 3,
+                "time": "3:43.35",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Yuichi SHIMOTSU",
+                  "country": "JPN",
+                  "year_birth": 1944,
+                  "team": "PAL OTA"
+                }
+              },
+              {
+                "rank": 4,
+                "time": "3:53.54",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Fernando CANEPA BUSTAMANTE",
+                  "country": "PER",
+                  "year_birth": 1947,
+                  "team": "PERU MASTER - Swim"
+                }
+              },
+              {
+                "rank": 5,
+                "time": "4:14.29",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Kenji HIROBAYASHI",
+                  "country": "JPN",
+                  "year_birth": 1948,
+                  "team": "KYUSHU UNIVERSITY MASTERS"
+                }
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          }
+        },
+        "subtree": {
+          "$": {
+            "tp": 126.94444444444444,
+            "fp": 1.0,
+            "fn": 4.055555555555555,
+            "score_sum": 10.998609179415855,
+            "count": 14,
+            "precision": 0.992184,
+            "recall": 0.969042,
+            "f1": 0.980476,
+            "mean_score": 0.785615
+          },
+          "$.championship": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details": {
+            "tp": 2.0,
+            "fp": 0.0,
+            "fn": 1.0,
+            "score_sum": 2.0,
+            "count": 3,
+            "precision": 1.0,
+            "recall": 0.666667,
+            "f1": 0.8,
+            "mean_score": 0.666667
+          },
+          "$.event_details.sex": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.length": {
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 1.0,
+            "score_sum": 0.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "mean_score": 0.0
+          },
+          "$.event_details.category": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups": {
+            "tp": 123.94444444444444,
+            "fp": 1.0,
+            "fn": 3.0555555555555554,
+            "score_sum": 7.998609179415856,
+            "count": 10,
+            "precision": 0.991996,
+            "recall": 0.975941,
+            "f1": 0.983903,
+            "mean_score": 0.799861
+          },
+          "$.age_groups[*]": {
+            "tp": 123.94444444444444,
+            "fp": 1.0,
+            "fn": 3.0555555555555554,
+            "score_sum": 6.998609179415856,
+            "count": 9,
+            "precision": 0.991996,
+            "recall": 0.975941,
+            "f1": 0.983903,
+            "mean_score": 0.777623
+          },
+          "$.age_groups[*].age_group": {
+            "tp": 4.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results": {
+            "tp": 119.94444444444444,
+            "fp": 1.0,
+            "fn": 3.0555555555555554,
+            "score_sum": 5.998609179415856,
+            "count": 8,
+            "precision": 0.991732,
+            "recall": 0.975158,
+            "f1": 0.983375,
+            "mean_score": 0.749826
+          },
+          "$.age_groups[*].results[*]": {
+            "tp": 119.94444444444444,
+            "fp": 1.0,
+            "fn": 0.05555555555555558,
+            "score_sum": 5.998609179415856,
+            "count": 7,
+            "precision": 0.991732,
+            "recall": 0.999537,
+            "f1": 0.995619,
+            "mean_score": 0.856944
+          },
+          "$.age_groups[*].results[*].rank": {
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].time": {
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].records": {
+            "tp": 0.0,
+            "fp": 1.0,
+            "fn": 0.0,
+            "score_sum": 0.0,
+            "count": 1,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "mean_score": 0.0
+          },
+          "$.age_groups[*].results[*].athlete_details": {
+            "tp": 79.94444444444444,
+            "fp": 0.0,
+            "fn": 0.05555555555555558,
+            "score_sum": 3.998609179415855,
+            "count": 4,
+            "precision": 1.0,
+            "recall": 0.999306,
+            "f1": 0.999653,
+            "mean_score": 0.999652
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "tp": 20.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "tp": 19.944444444444443,
+            "fp": 0.0,
+            "fn": 0.05555555555555558,
+            "score_sum": 0.9986091794158553,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 0.997222,
+            "f1": 0.998609,
+            "mean_score": 0.998609
+          }
+        },
+        "errors": [
+          {
+            "path": "$.event_details.length",
+            "metric_id": "string_exact",
+            "kind": "omission",
+            "gold": "50m",
+            "extracted": "200m",
+            "reason": null,
+            "error": null,
+            "score": 0.0,
+            "fp": 0.0,
+            "fn": 1.0
+          },
+          {
+            "path": "$.age_groups[*].results[*].records",
+            "metric_id": "array_llm",
+            "kind": "array_item_mismatch",
+            "gold": null,
+            "extracted": null,
+            "reason": "both_absent",
+            "error": null,
+            "score": null,
+            "fp": 1.0,
+            "fn": 0.0
+          },
+          {
+            "path": "$.age_groups[*].results[*].athlete_details.team",
+            "metric_id": "string_fuzzy",
+            "kind": "array_item_mismatch",
+            "gold": "PAL OTA",
+            "extracted": "PAL OTA",
+            "reason": null,
+            "error": null,
+            "score": null,
+            "fp": 0.0,
+            "fn": 0.05555555555555558
+          },
+          {
+            "path": "$.age_groups[*].results",
+            "metric_id": "array_llm",
+            "kind": "array_item_mismatch",
+            "gold": [
+              {
+                "rank": 1,
+                "athlete_details": {
+                  "athlete": "Osamu KUMAGAI",
+                  "country": "JPN",
+                  "year_birth": 1947,
+                  "team": "FITTA MATSUYAMA"
+                },
+                "time": "3:20.20"
+              },
+              {
+                "rank": 2,
+                "athlete_details": {
+                  "athlete": "Michael MACMANUS",
+                  "country": "JPN",
+                  "year_birth": 1946,
+                  "team": "ITOMAN MUKAIYAMA"
+                },
+                "time": "3:31.67"
+              },
+              {
+                "rank": 3,
+                "athlete_details": {
+                  "athlete": "Yuichi SHIMOTSU",
+                  "country": "JPN",
+                  "year_birth": 1944,
+                  "team": "PAL OTA"
+                },
+                "time": "3:43.35"
+              },
+              {
+                "rank": 4,
+                "athlete_details": {
+                  "athlete": "Fernando CANEPA BUSTAMANTE",
+                  "country": "PER",
+                  "year_birth": 1947,
+                  "team": "PERU MASTER \u2013 Swim"
+                },
+                "time": "3:53.54"
+              },
+              {
+                "rank": 5,
+                "athlete_details": {
+                  "athlete": "Kenji HIROBAYASHI",
+                  "country": "JPN",
+                  "year_birth": 1948,
+                  "team": "KYUSHU UNIVERSITY MASTERS"
+                },
+                "time": "4:14.29"
+              },
+              {
+                "rank": 6,
+                "athlete_details": {
+                  "athlete": "Morrie CHIANG",
+                  "country": "TPE",
+                  "year_birth": 1947,
+                  "team": "Chinese Taipei Master Swim"
+                },
+                "time": "4:23.36"
+              },
+              {
+                "rank": "NA",
+                "athlete_details": {
+                  "athlete": "David EDSALL",
+                  "country": "USA",
+                  "year_birth": 1948,
+                  "team": "New England Masters Swim"
+                },
+                "time": "DSQ"
+              },
+              {
+                "rank": "NA",
+                "athlete_details": {
+                  "athlete": "Bob WHITE",
+                  "country": "USA",
+                  "year_birth": 1948,
+                  "team": "Puget Sound Masters"
+                },
+                "time": "DNS"
+              }
+            ],
+            "extracted": [
+              {
+                "rank": 1,
+                "time": "3:20.20",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Osamu KUMAGAI",
+                  "country": "JPN",
+                  "year_birth": 1947,
+                  "team": "FITTA MATSUYAMA"
+                }
+              },
+              {
+                "rank": 2,
+                "time": "3:31.67",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Michael MACMANUS",
+                  "country": "JPN",
+                  "year_birth": 1946,
+                  "team": "ITOMAN MUKAIYAMA"
+                }
+              },
+              {
+                "rank": 3,
+                "time": "3:43.35",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Yuichi SHIMOTSU",
+                  "country": "JPN",
+                  "year_birth": 1944,
+                  "team": "PAL OTA"
+                }
+              },
+              {
+                "rank": 4,
+                "time": "3:53.54",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Fernando CANEPA BUSTAMANTE",
+                  "country": "PER",
+                  "year_birth": 1947,
+                  "team": "PERU MASTER - Swim"
+                }
+              },
+              {
+                "rank": 5,
+                "time": "4:14.29",
+                "records": null,
+                "athlete_details": {
+                  "athlete": "Kenji HIROBAYASHI",
+                  "country": "JPN",
+                  "year_birth": 1948,
+                  "team": "KYUSHU UNIVERSITY MASTERS"
+                }
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "score": null,
+            "fp": 0.0,
+            "fn": 3.0
+          }
+        ]
+      }
+    },
+    "merged_subtrees": {
+      "$": {
+        "tp": 193.94444444444446,
+        "fp": 2.0,
+        "fn": 4.055555555555555,
+        "score_sum": 0.0,
+        "count": 14,
+        "precision": 0.989793,
+        "recall": 0.979517,
+        "f1": 0.984628,
+        "mean_score": 0.0
+      },
+      "$.championship": {
+        "tp": 2.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.event_details": {
+        "tp": 5.0,
+        "fp": 0.0,
+        "fn": 1.0,
+        "score_sum": 0.0,
+        "count": 3,
+        "precision": 1.0,
+        "recall": 0.833333,
+        "f1": 0.909091,
+        "mean_score": 0.0
+      },
+      "$.event_details.sex": {
+        "tp": 2.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.event_details.length": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 1.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.666667,
+        "mean_score": 0.0
+      },
+      "$.event_details.category": {
+        "tp": 2.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups": {
+        "tp": 186.94444444444446,
+        "fp": 2.0,
+        "fn": 3.0555555555555554,
+        "score_sum": 0.0,
+        "count": 10,
+        "precision": 0.989415,
+        "recall": 0.983918,
+        "f1": 0.986659,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*]": {
+        "tp": 186.94444444444446,
+        "fp": 2.0,
+        "fn": 3.0555555555555554,
+        "score_sum": 0.0,
+        "count": 9,
+        "precision": 0.989415,
+        "recall": 0.983918,
+        "f1": 0.986659,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].age_group": {
+        "tp": 7.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results": {
+        "tp": 179.94444444444446,
+        "fp": 2.0,
+        "fn": 3.0555555555555554,
+        "score_sum": 0.0,
+        "count": 8,
+        "precision": 0.989008,
+        "recall": 0.983303,
+        "f1": 0.986147,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*]": {
+        "tp": 179.94444444444446,
+        "fp": 2.0,
+        "fn": 0.05555555555555558,
+        "score_sum": 0.0,
+        "count": 7,
+        "precision": 0.989008,
+        "recall": 0.999691,
+        "f1": 0.994321,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].rank": {
+        "tp": 30.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].time": {
+        "tp": 30.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].records": {
+        "tp": 0.0,
+        "fp": 2.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].athlete_details": {
+        "tp": 119.94444444444444,
+        "fp": 0.0,
+        "fn": 0.05555555555555558,
+        "score_sum": 0.0,
+        "count": 4,
+        "precision": 1.0,
+        "recall": 0.999537,
+        "f1": 0.999768,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].athlete_details.athlete": {
+        "tp": 30.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].athlete_details.country": {
+        "tp": 30.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].athlete_details.year_birth": {
+        "tp": 30.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 0.0
+      },
+      "$.age_groups[*].results[*].athlete_details.team": {
+        "tp": 29.944444444444443,
+        "fp": 0.0,
+        "fn": 0.05555555555555558,
+        "score_sum": 0.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 0.998148,
+        "f1": 0.999073,
+        "mean_score": 0.0
+      }
+    }
+  },
+  "summary": {
+    "run_id": "swimming-srpbo-v1",
+    "best_candidate_id": "c5_0",
+    "test_f1": 1.0,
+    "test_aggregate_f1": 1.0,
+    "test_json_valid_rate": 1.0,
+    "val_f1": 0.9927758395883991,
+    "pareto_front": [
+      {
+        "candidate_id": "c5_0",
+        "val_f1": 0.9927758395883991,
+        "aggregate_f1": 0.964737
+      }
+    ],
+    "spent_tokens": 282739,
+    "spent_usd": 0.0,
+    "seed_test_f1": 1.0,
+    "seed_test_aggregate_f1": 1.0,
+    "seed_test_note": "test_f1/seed_test_f1 re-measured with extractor max_output_tokens=3000; finalize_test_f1 is the run's own pass under the transient 1200 cap (truncation)",
+    "finalize_test_f1": 0.9636363636363636,
+    "finalize_test_aggregate_f1": 0.9869279999999999
+  },
+  "test_per_document": {
+    "f1": 0.9636363636363636,
+    "aggregate_f1": 0.9869279999999999,
+    "json_valid_rate": 1.0,
+    "per_doc": {
+      "ma_2023_sw_M-table1": {
+        "micro_f1": 0.9636363636363636,
+        "macro_subtree_f1": 0.9869279999999999,
+        "precision": 0.9636363636363636,
+        "recall": 0.9636363636363636,
+        "tp": 53.0,
+        "fp": 2.0,
+        "fn": 2.0,
+        "mean_metric_score": 0.8666666666666666,
+        "n_scored_nodes": 5,
+        "json_valid": true,
+        "nodes": {
+          "$.championship": {
+            "path": "$.championship",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "extracted": "WORLD AQUATICS MASTERS CHAMPIONSHIPS KYUSHU 2023",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.sex": {
+            "path": "$.event_details.sex",
+            "metric_id": "string_case_insensitive",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "MEN",
+            "extracted": "MEN",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.length": {
+            "path": "$.event_details.length",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "50m",
+            "extracted": "50m",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.event_details.category": {
+            "path": "$.event_details.category",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Freestyle",
+            "extracted": "Freestyle",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups": {
+            "path": "$.age_groups",
+            "metric_id": "array_llm",
+            "score": 0.3333333333333333,
+            "passed": false,
+            "tp": 0.0,
+            "fp": 2.0,
+            "fn": 2.0,
+            "gold": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Fusao TAKAHASHI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "JUMP"
+                    },
+                    "time": "44.01",
+                    "records": null
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Mitsunobu YOSHIZAWA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "JSS TATEISHI"
+                    },
+                    "time": "46.80",
+                    "records": null
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Kazuyuki FUKUDA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "RYOGOKU KINGYO"
+                    },
+                    "time": "55.77",
+                    "records": null
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Toshiyasu MINAMI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "FUKUOKA MOON CLUB"
+                    },
+                    "time": "59.63",
+                    "records": null
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Jose PENALOZA",
+                      "country": "PER",
+                      "year_birth": 1932,
+                      "team": "PERU MASTER - Swim"
+                    },
+                    "time": "59.84",
+                    "records": null
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Itaru YANAGAWA",
+                      "country": "JPN",
+                      "year_birth": 1930,
+                      "team": "ITOMAN NAGAZUMI"
+                    },
+                    "time": "1:03.28",
+                    "records": null
+                  },
+                  {
+                    "rank": 7,
+                    "athlete_details": {
+                      "athlete": "Adelson LEITE JULIAO",
+                      "country": "BRA",
+                      "year_birth": 1933,
+                      "team": "CIRCULO MILITAR DE FORTALEZA"
+                    },
+                    "time": "1:04.81",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Tohru FURUKAWA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KAMOIKE SS"
+                    },
+                    "time": "33.74",
+                    "records": [
+                      "WR",
+                      "CR"
+                    ]
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Hiroshi MATSUMOTO",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "TEAM FURINKAZAN"
+                    },
+                    "time": "37.86",
+                    "records": null
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Shigeo OGASAWARA",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "EIAI CLUB"
+                    },
+                    "time": "39.04",
+                    "records": null
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Waroku HORIBE",
+                      "country": "JPN",
+                      "year_birth": 1934,
+                      "team": "FUKUOKA MOON CLUB"
+                    },
+                    "time": "45.22",
+                    "records": null
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Haruyoshi NAKAZONO",
+                      "country": "JPN",
+                      "year_birth": 1937,
+                      "team": "RN FUKUOKANISHIJIN"
+                    },
+                    "time": "45.63",
+                    "records": null
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Takanobu SOMA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KSC SENRI"
+                    },
+                    "time": "46.57",
+                    "records": null
+                  },
+                  {
+                    "rank": 7,
+                    "athlete_details": {
+                      "athlete": "Anthony REBUCK",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Malvern Marlins"
+                    },
+                    "time": "53.18",
+                    "records": null
+                  },
+                  {
+                    "rank": 8,
+                    "athlete_details": {
+                      "athlete": "Iuliu EUGEN LEHEL FOLLERT",
+                      "country": "ROU",
+                      "year_birth": 1938,
+                      "team": "Tribeach Brasov"
+                    },
+                    "time": "1:00.50",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Masakazu MITSUHASHI",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "CFC SOGA"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Manfred BUSCH",
+                      "country": "GER",
+                      "year_birth": 1938,
+                      "team": "Berliner TSC"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  }
+                ]
+              }
+            ],
+            "extracted": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "44.01",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Fusao TAKAHASHI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "JUMP"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "46.80",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Mitsunobu YOSHIZAWA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "JSS TATEISHI"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "55.77",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kazuyuki FUKUDA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "RYOGOKU KINGYO"
+                    }
+                  },
+                  {
+                    "rank": 4,
+                    "time": "59.63",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Toshiyasu MINAMI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "FUKUOKA MOON CLUB"
+                    }
+                  },
+                  {
+                    "rank": 5,
+                    "time": "59.84",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Jose PENALOZA",
+                      "country": "PER",
+                      "year_birth": 1932,
+                      "team": "PERU MASTER - Swim"
+                    }
+                  },
+                  {
+                    "rank": 6,
+                    "time": "1:03.28",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Itaru YANAGAWA",
+                      "country": "JPN",
+                      "year_birth": 1930,
+                      "team": "ITOMAN NAGAZUMI"
+                    }
+                  },
+                  {
+                    "rank": 7,
+                    "time": "1:04.81",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Adelson LEITE JULIAO",
+                      "country": "BRA",
+                      "year_birth": 1933,
+                      "team": "CIRCULO MILITAR DE FORTALEZA"
+                    }
+                  },
+                  {
+                    "rank": "NA",
+                    "time": "DNS",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "33.74",
+                    "records": [
+                      "WR",
+                      "CR"
+                    ],
+                    "athlete_details": {
+                      "athlete": "Tohru FURUKAWA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KAMOIKE SS"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "37.86",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Hiroshi MATSUMOTO",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "TEAM FURINKAZAN"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "39.04",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Shigeo OGASAWARA",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "EIAI CLUB"
+                    }
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "is_item_leaf": false
+          },
+          "$.age_groups[*].age_group": {
+            "path": "$.age_groups[*].age_group",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "90-94",
+            "extracted": "90-94",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].rank": {
+            "path": "$.age_groups[*].results[*].rank",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "NA",
+            "extracted": "NA",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].time": {
+            "path": "$.age_groups[*].results[*].time",
+            "metric_id": "string_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "DNS",
+            "extracted": "DNS",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].records": {
+            "path": "$.age_groups[*].results[*].records",
+            "metric_id": "array_llm",
+            "score": 1.0,
+            "passed": true,
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": null,
+            "extracted": null,
+            "reason": "both_null",
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "path": "$.age_groups[*].results[*].athlete_details.athlete",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "Carlos SALAZAR FLORES",
+            "extracted": "Carlos SALAZAR FLORES",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "path": "$.age_groups[*].results[*].athlete_details.country",
+            "metric_id": "string_semantic",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "MEX",
+            "extracted": "MEX",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "path": "$.age_groups[*].results[*].athlete_details.year_birth",
+            "metric_id": "integer_exact",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": 1933,
+            "extracted": 1933,
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "path": "$.age_groups[*].results[*].athlete_details.team",
+            "metric_id": "string_fuzzy",
+            "score": 1.0,
+            "passed": true,
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "gold": "CLUB BANCARIO DE GUADALAJARA",
+            "extracted": "CLUB BANCARIO DE GUADALAJARA",
+            "reason": null,
+            "error": null,
+            "is_item_leaf": true
+          }
+        },
+        "subtree": {
+          "$": {
+            "tp": 53.0,
+            "fp": 2.0,
+            "fn": 2.0,
+            "score_sum": 12.333333333333332,
+            "count": 13,
+            "precision": 0.963636,
+            "recall": 0.963636,
+            "f1": 0.963636,
+            "mean_score": 0.948718
+          },
+          "$.championship": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details": {
+            "tp": 3.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 3.0,
+            "count": 3,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.sex": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.length": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.event_details.category": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups": {
+            "tp": 49.0,
+            "fp": 2.0,
+            "fn": 2.0,
+            "score_sum": 8.333333333333332,
+            "count": 9,
+            "precision": 0.960784,
+            "recall": 0.960784,
+            "f1": 0.960784,
+            "mean_score": 0.925926
+          },
+          "$.age_groups[*]": {
+            "tp": 49.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 8.0,
+            "count": 8,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].age_group": {
+            "tp": 1.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results": {
+            "tp": 48.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 7.0,
+            "count": 7,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*]": {
+            "tp": 48.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 7.0,
+            "count": 7,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].rank": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].time": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].records": {
+            "tp": 0.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details": {
+            "tp": 32.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 4.0,
+            "count": 4,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.athlete": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.country": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.year_birth": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          },
+          "$.age_groups[*].results[*].athlete_details.team": {
+            "tp": 8.0,
+            "fp": 0.0,
+            "fn": 0.0,
+            "score_sum": 1.0,
+            "count": 1,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "mean_score": 1.0
+          }
+        },
+        "errors": [
+          {
+            "path": "$.age_groups",
+            "metric_id": "array_llm",
+            "kind": "mismatch",
+            "gold": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Fusao TAKAHASHI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "JUMP"
+                    },
+                    "time": "44.01",
+                    "records": null
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Mitsunobu YOSHIZAWA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "JSS TATEISHI"
+                    },
+                    "time": "46.80",
+                    "records": null
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Kazuyuki FUKUDA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "RYOGOKU KINGYO"
+                    },
+                    "time": "55.77",
+                    "records": null
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Toshiyasu MINAMI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "FUKUOKA MOON CLUB"
+                    },
+                    "time": "59.63",
+                    "records": null
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Jose PENALOZA",
+                      "country": "PER",
+                      "year_birth": 1932,
+                      "team": "PERU MASTER - Swim"
+                    },
+                    "time": "59.84",
+                    "records": null
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Itaru YANAGAWA",
+                      "country": "JPN",
+                      "year_birth": 1930,
+                      "team": "ITOMAN NAGAZUMI"
+                    },
+                    "time": "1:03.28",
+                    "records": null
+                  },
+                  {
+                    "rank": 7,
+                    "athlete_details": {
+                      "athlete": "Adelson LEITE JULIAO",
+                      "country": "BRA",
+                      "year_birth": 1933,
+                      "team": "CIRCULO MILITAR DE FORTALEZA"
+                    },
+                    "time": "1:04.81",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "athlete_details": {
+                      "athlete": "Tohru FURUKAWA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KAMOIKE SS"
+                    },
+                    "time": "33.74",
+                    "records": [
+                      "WR",
+                      "CR"
+                    ]
+                  },
+                  {
+                    "rank": 2,
+                    "athlete_details": {
+                      "athlete": "Hiroshi MATSUMOTO",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "TEAM FURINKAZAN"
+                    },
+                    "time": "37.86",
+                    "records": null
+                  },
+                  {
+                    "rank": 3,
+                    "athlete_details": {
+                      "athlete": "Shigeo OGASAWARA",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "EIAI CLUB"
+                    },
+                    "time": "39.04",
+                    "records": null
+                  },
+                  {
+                    "rank": 4,
+                    "athlete_details": {
+                      "athlete": "Waroku HORIBE",
+                      "country": "JPN",
+                      "year_birth": 1934,
+                      "team": "FUKUOKA MOON CLUB"
+                    },
+                    "time": "45.22",
+                    "records": null
+                  },
+                  {
+                    "rank": 5,
+                    "athlete_details": {
+                      "athlete": "Haruyoshi NAKAZONO",
+                      "country": "JPN",
+                      "year_birth": 1937,
+                      "team": "RN FUKUOKANISHIJIN"
+                    },
+                    "time": "45.63",
+                    "records": null
+                  },
+                  {
+                    "rank": 6,
+                    "athlete_details": {
+                      "athlete": "Takanobu SOMA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KSC SENRI"
+                    },
+                    "time": "46.57",
+                    "records": null
+                  },
+                  {
+                    "rank": 7,
+                    "athlete_details": {
+                      "athlete": "Anthony REBUCK",
+                      "country": "AUS",
+                      "year_birth": 1937,
+                      "team": "Malvern Marlins"
+                    },
+                    "time": "53.18",
+                    "records": null
+                  },
+                  {
+                    "rank": 8,
+                    "athlete_details": {
+                      "athlete": "Iuliu EUGEN LEHEL FOLLERT",
+                      "country": "ROU",
+                      "year_birth": 1938,
+                      "team": "Tribeach Brasov"
+                    },
+                    "time": "1:00.50",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Masakazu MITSUHASHI",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "CFC SOGA"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  },
+                  {
+                    "rank": "NA",
+                    "athlete_details": {
+                      "athlete": "Manfred BUSCH",
+                      "country": "GER",
+                      "year_birth": 1938,
+                      "team": "Berliner TSC"
+                    },
+                    "time": "DNS",
+                    "records": null
+                  }
+                ]
+              }
+            ],
+            "extracted": [
+              {
+                "age_group": "90-94",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "44.01",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Fusao TAKAHASHI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "JUMP"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "46.80",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Mitsunobu YOSHIZAWA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "JSS TATEISHI"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "55.77",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Kazuyuki FUKUDA",
+                      "country": "JPN",
+                      "year_birth": 1932,
+                      "team": "RYOGOKU KINGYO"
+                    }
+                  },
+                  {
+                    "rank": 4,
+                    "time": "59.63",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Toshiyasu MINAMI",
+                      "country": "JPN",
+                      "year_birth": 1933,
+                      "team": "FUKUOKA MOON CLUB"
+                    }
+                  },
+                  {
+                    "rank": 5,
+                    "time": "59.84",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Jose PENALOZA",
+                      "country": "PER",
+                      "year_birth": 1932,
+                      "team": "PERU MASTER - Swim"
+                    }
+                  },
+                  {
+                    "rank": 6,
+                    "time": "1:03.28",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Itaru YANAGAWA",
+                      "country": "JPN",
+                      "year_birth": 1930,
+                      "team": "ITOMAN NAGAZUMI"
+                    }
+                  },
+                  {
+                    "rank": 7,
+                    "time": "1:04.81",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Adelson LEITE JULIAO",
+                      "country": "BRA",
+                      "year_birth": 1933,
+                      "team": "CIRCULO MILITAR DE FORTALEZA"
+                    }
+                  },
+                  {
+                    "rank": "NA",
+                    "time": "DNS",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Carlos SALAZAR FLORES",
+                      "country": "MEX",
+                      "year_birth": 1933,
+                      "team": "CLUB BANCARIO DE GUADALAJARA"
+                    }
+                  }
+                ]
+              },
+              {
+                "age_group": "85-89",
+                "results": [
+                  {
+                    "rank": 1,
+                    "time": "33.74",
+                    "records": [
+                      "WR",
+                      "CR"
+                    ],
+                    "athlete_details": {
+                      "athlete": "Tohru FURUKAWA",
+                      "country": "JPN",
+                      "year_birth": 1938,
+                      "team": "KAMOIKE SS"
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "time": "37.86",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Hiroshi MATSUMOTO",
+                      "country": "JPN",
+                      "year_birth": 1936,
+                      "team": "TEAM FURINKAZAN"
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "time": "39.04",
+                    "records": null,
+                    "athlete_details": {
+                      "athlete": "Shigeo OGASAWARA",
+                      "country": "JPN",
+                      "year_birth": 1935,
+                      "team": "EIAI CLUB"
+                    }
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "error": null,
+            "score": 0.3333333333333333,
+            "fp": 2.0,
+            "fn": 2.0
+          }
+        ]
+      }
+    },
+    "merged_subtrees": {
+      "$": {
+        "tp": 53.0,
+        "fp": 2.0,
+        "fn": 2.0,
+        "score_sum": 12.333333333333332,
+        "count": 13,
+        "precision": 0.963636,
+        "recall": 0.963636,
+        "f1": 0.963636,
+        "mean_score": 0.948718
+      },
+      "$.championship": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.event_details": {
+        "tp": 3.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 3.0,
+        "count": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.event_details.sex": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.event_details.length": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.event_details.category": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups": {
+        "tp": 49.0,
+        "fp": 2.0,
+        "fn": 2.0,
+        "score_sum": 8.333333333333332,
+        "count": 9,
+        "precision": 0.960784,
+        "recall": 0.960784,
+        "f1": 0.960784,
+        "mean_score": 0.925926
+      },
+      "$.age_groups[*]": {
+        "tp": 49.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 8.0,
+        "count": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].age_group": {
+        "tp": 1.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results": {
+        "tp": 48.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 7.0,
+        "count": 7,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*]": {
+        "tp": 48.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 7.0,
+        "count": 7,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].rank": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].time": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].records": {
+        "tp": 0.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].athlete_details": {
+        "tp": 32.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 4.0,
+        "count": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].athlete_details.athlete": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].athlete_details.country": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].athlete_details.year_birth": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      },
+      "$.age_groups[*].results[*].athlete_details.team": {
+        "tp": 8.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "score_sum": 1.0,
+        "count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_score": 1.0
+      }
+    }
+  },
+  "iterations": [
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 1,
+      "candidate_id": "c1_0",
+      "parent_id": "root",
+      "mutation_type": "llm_preamble_edit",
+      "target_subtree": "global_preamble",
+      "hypothesis": "The model will replace placeholder rank values (e.g., \"NA\") with null, eliminating rank mismatches while preserving other array items.",
+      "train_f1": 0.9750473819168308,
+      "val_f1": 0.8834586466165413,
+      "subtree_scores_json": "{\"$\": {\"tp\": 80.0, \"fp\": 3.0, \"fn\": 8.0, \"score_sum\": 0.0, \"count\": 13, \"precision\": 0.963855, \"recall\": 0.909091, \"f1\": 0.935673, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 75.0, \"fp\": 3.0, \"fn\": 5.0, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.961538, \"recall\": 0.9375, \"f1\": 0.949367, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 75.0, \"fp\": 1.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.986842, \"recall\": 0.974026, \"f1\": 0.980392, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 70.0, \"fp\": 1.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985915, \"recall\": 0.972222, \"f1\": 0.979021, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 70.0, \"fp\": 1.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985915, \"recall\": 0.972222, \"f1\": 0.979021, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 1.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 48.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "ACCEPTED",
+      "decision_reason": "val F1 0.8835 vs incumbent 0.8524; aggregate 0.5994",
+      "created_at": 1792313332.998285
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 1,
+      "candidate_id": "c1_1",
+      "parent_id": "root",
+      "mutation_type": "llm_checklist_edit",
+      "target_subtree": "verification_checklist",
+      "hypothesis": "An explicit checklist reminder will reinforce the placeholder\u2011to\u2011null rule, reducing the chance of copying invalid rank strings like \"1/2\".",
+      "train_f1": 0.9634190620847505,
+      "val_f1": 0.9393322373636646,
+      "subtree_scores_json": "{\"$\": {\"tp\": 146.2, \"fp\": 2.0, \"fn\": 18.799999999999997, \"score_sum\": 0.0, \"count\": 13, \"precision\": 0.986505, \"recall\": 0.886061, \"f1\": 0.933589, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 141.2, \"fp\": 2.0, \"fn\": 15.799999999999999, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.986034, \"recall\": 0.899363, \"f1\": 0.940706, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 141.2, \"fp\": 2.0, \"fn\": 14.799999999999999, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.986034, \"recall\": 0.905128, \"f1\": 0.94385, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 6.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 135.2, \"fp\": 2.0, \"fn\": 14.799999999999999, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985423, \"recall\": 0.901333, \"f1\": 0.941504, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 135.2, \"fp\": 2.0, \"fn\": 14.799999999999999, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985423, \"recall\": 0.901333, \"f1\": 0.941504, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 10.2, \"fp\": 0.0, \"fn\": 14.799999999999999, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.408, \"f1\": 0.579545, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 2.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 100.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "ACCEPTED",
+      "decision_reason": "val F1 0.9393 vs incumbent 0.8524; aggregate 0.6156",
+      "created_at": 1792313525.910497
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 2,
+      "candidate_id": "c2_0",
+      "parent_id": "c1_1",
+      "mutation_type": "llm_preamble_edit",
+      "target_subtree": "global_preamble",
+      "hypothesis": "Explicitly stating the integer\u2011only requirement for rank will stop the model from copying non\u2011numeric placeholders, fixing the array_item_mismatch errors.",
+      "train_f1": 0.9609609169877533,
+      "val_f1": 0.9282822440717178,
+      "subtree_scores_json": "{\"$\": {\"tp\": 145.0, \"fp\": 4.0, \"fn\": 21.0, \"score_sum\": 0.0, \"count\": 13, \"precision\": 0.973154, \"recall\": 0.873494, \"f1\": 0.920635, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 140.0, \"fp\": 4.0, \"fn\": 18.0, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.972222, \"recall\": 0.886076, \"f1\": 0.927152, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 140.0, \"fp\": 2.0, \"fn\": 16.0, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.985915, \"recall\": 0.897436, \"f1\": 0.939597, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 6.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 134.0, \"fp\": 2.0, \"fn\": 16.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985294, \"recall\": 0.893333, \"f1\": 0.937063, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 134.0, \"fp\": 2.0, \"fn\": 16.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985294, \"recall\": 0.893333, \"f1\": 0.937063, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 9.0, \"fp\": 0.0, \"fn\": 16.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.36, \"f1\": 0.529412, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 2.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 100.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 25.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "REJECTED_DOMINATED",
+      "decision_reason": "val F1 0.9283 dominated on (val, aggregate) by existing front entries",
+      "created_at": 1792314178.957454
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 2,
+      "candidate_id": "c2_1",
+      "parent_id": "c1_1",
+      "mutation_type": "llm_directive_edit",
+      "target_subtree": "$.age_groups",
+      "hypothesis": "A subtree\u2011specific reminder reinforces the global rule for rank, ensuring the model applies null handling consistently within the age_groups array.",
+      "train_f1": 0.9634190620847505,
+      "val_f1": 0.774436090225564,
+      "subtree_scores_json": "{\"$\": {\"tp\": 67.0, \"fp\": 1.0, \"fn\": 5.0, \"score_sum\": 0.0, \"count\": 13, \"precision\": 0.985294, \"recall\": 0.930556, \"f1\": 0.957143, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 62.0, \"fp\": 1.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.984127, \"recall\": 0.96875, \"f1\": 0.976378, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 62.0, \"fp\": 1.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.984127, \"recall\": 0.984127, \"f1\": 0.984127, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 3.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 59.0, \"fp\": 1.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.983333, \"recall\": 0.983333, \"f1\": 0.983333, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 59.0, \"fp\": 1.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.983333, \"recall\": 0.983333, \"f1\": 0.983333, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 9.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.9, \"f1\": 0.947368, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 1.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 40.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 10.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "REJECTED_DOMINATED",
+      "decision_reason": "val F1 0.7744 dominated on (val, aggregate) by existing front entries",
+      "created_at": 1792314298.757783
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 3,
+      "candidate_id": "c3_0",
+      "parent_id": "c1_1",
+      "mutation_type": "llm_directive_edit",
+      "target_subtree": "$.age_groups",
+      "hypothesis": "Enforces null for non\u2011integer rank values, fixing array_item_mismatch where gold expects null.",
+      "train_f1": 0.9725892368198337,
+      "val_f1": 0.8671001828896565,
+      "subtree_scores_json": "{\"$\": {\"tp\": 79.0, \"fp\": 3.0, \"fn\": 9.0, \"score_sum\": 0.0, \"count\": 13, \"precision\": 0.963415, \"recall\": 0.897727, \"f1\": 0.929412, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 74.0, \"fp\": 3.0, \"fn\": 6.0, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.961039, \"recall\": 0.925, \"f1\": 0.942675, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 74.0, \"fp\": 1.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.986667, \"recall\": 0.961039, \"f1\": 0.973684, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 69.0, \"fp\": 1.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985714, \"recall\": 0.958333, \"f1\": 0.971831, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 69.0, \"fp\": 1.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.985714, \"recall\": 0.958333, \"f1\": 0.971831, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 9.0, \"fp\": 0.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.75, \"f1\": 0.857143, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 1.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 48.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 12.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "REJECTED_DOMINATED",
+      "decision_reason": "val F1 0.8671 dominated on (val, aggregate) by existing front entries",
+      "created_at": 1792314449.2649589
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 3,
+      "candidate_id": "c3_1",
+      "parent_id": "c1_1",
+      "mutation_type": "llm_checklist_edit",
+      "target_subtree": "verification_checklist",
+      "hypothesis": "Provides an explicit checklist reminder, reinforcing the rule and reducing missed cases.",
+      "train_f1": 0.9750473819168308,
+      "val_f1": 0.9722382880277618,
+      "subtree_scores_json": "{\"$\": {\"tp\": 153.0, \"fp\": 2.0, \"fn\": 7.0, \"score_sum\": 0.0, \"count\": 14, \"precision\": 0.987097, \"recall\": 0.95625, \"f1\": 0.971429, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 0.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 148.0, \"fp\": 2.0, \"fn\": 4.0, \"score_sum\": 0.0, \"count\": 10, \"precision\": 0.986667, \"recall\": 0.973684, \"f1\": 0.980132, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 148.0, \"fp\": 2.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.986667, \"recall\": 0.980132, \"f1\": 0.983389, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 6.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 142.0, \"fp\": 2.0, \"fn\": 3.0, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.986111, \"recall\": 0.97931, \"f1\": 0.982699, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 142.0, \"fp\": 2.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.986111, \"recall\": 0.986111, \"f1\": 0.986111, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 22.0, \"fp\": 0.0, \"fn\": 2.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.916667, \"f1\": 0.956522, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 24.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 2.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 96.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 24.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 24.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 24.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 24.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}}",
+      "decision": "ACCEPTED",
+      "decision_reason": "val F1 0.9722 vs incumbent 0.9393; aggregate 0.6269",
+      "created_at": 1792314633.9687428
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 4,
+      "candidate_id": "c4_0",
+      "parent_id": "root",
+      "mutation_type": "llm_directive_edit",
+      "target_subtree": "$.age_groups",
+      "hypothesis": "Array item mismatches often arise from ordering differences or dropped/extra rows in results tables. Explicitly enforcing 1:1 row-to-object mapping and strict document order prevents misalignment.",
+      "train_f1": 0.9930852141969252,
+      "val_f1": 0.9865344426168283,
+      "subtree_scores_json": "{\"$\": {\"tp\": 193.94444444444446, \"fp\": 2.0, \"fn\": 4.055555555555555, \"score_sum\": 0.0, \"count\": 14, \"precision\": 0.989793, \"recall\": 0.979517, \"f1\": 0.984628, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 186.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 10, \"precision\": 0.989415, \"recall\": 0.983918, \"f1\": 0.986659, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 186.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.989415, \"recall\": 0.983918, \"f1\": 0.986659, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 7.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 179.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.989008, \"recall\": 0.983303, \"f1\": 0.986147, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 179.94444444444446, \"fp\": 2.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.989008, \"recall\": 0.999691, \"f1\": 0.994321, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 2.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 119.94444444444444, \"fp\": 0.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 0.999537, \"f1\": 0.999768, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 29.944444444444443, \"fp\": 0.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.998148, \"f1\": 0.999073, \"mean_score\": 0.0}}",
+      "decision": "ACCEPTED",
+      "decision_reason": "val F1 0.9865 vs incumbent 0.9865; aggregate 0.9627",
+      "created_at": 1792318479.08616
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 4,
+      "candidate_id": "c4_1",
+      "parent_id": "root",
+      "mutation_type": "llm_checklist_edit",
+      "target_subtree": "verification_checklist",
+      "hypothesis": "Checking array length consistency helps detect dropped or extra items that cause index misalignment (array_item_mismatch) in downstream comparisons.",
+      "train_f1": 0.9930852141969252,
+      "val_f1": 0.9865344426168283,
+      "subtree_scores_json": "{\"$\": {\"tp\": 193.94444444444446, \"fp\": 2.0, \"fn\": 4.055555555555555, \"score_sum\": 0.0, \"count\": 14, \"precision\": 0.989793, \"recall\": 0.979517, \"f1\": 0.984628, \"mean_score\": 0.0}, \"$.championship\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details\": {\"tp\": 5.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 3, \"precision\": 1.0, \"recall\": 0.833333, \"f1\": 0.909091, \"mean_score\": 0.0}, \"$.event_details.sex\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.event_details.length\": {\"tp\": 1.0, \"fp\": 0.0, \"fn\": 1.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.5, \"f1\": 0.666667, \"mean_score\": 0.0}, \"$.event_details.category\": {\"tp\": 2.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups\": {\"tp\": 186.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 10, \"precision\": 0.989415, \"recall\": 0.983918, \"f1\": 0.986659, \"mean_score\": 0.0}, \"$.age_groups[*]\": {\"tp\": 186.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 9, \"precision\": 0.989415, \"recall\": 0.983918, \"f1\": 0.986659, \"mean_score\": 0.0}, \"$.age_groups[*].age_group\": {\"tp\": 7.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results\": {\"tp\": 179.94444444444446, \"fp\": 2.0, \"fn\": 3.0555555555555554, \"score_sum\": 0.0, \"count\": 8, \"precision\": 0.989008, \"recall\": 0.983303, \"f1\": 0.986147, \"mean_score\": 0.0}, \"$.age_groups[*].results[*]\": {\"tp\": 179.94444444444446, \"fp\": 2.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 7, \"precision\": 0.989008, \"recall\": 0.999691, \"f1\": 0.994321, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].rank\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].time\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].records\": {\"tp\": 0.0, \"fp\": 2.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 0.0, \"recall\": 1.0, \"f1\": 0.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details\": {\"tp\": 119.94444444444444, \"fp\": 0.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 4, \"precision\": 1.0, \"recall\": 0.999537, \"f1\": 0.999768, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.athlete\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.country\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.year_birth\": {\"tp\": 30.0, \"fp\": 0.0, \"fn\": 0.0, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0, \"mean_score\": 0.0}, \"$.age_groups[*].results[*].athlete_details.team\": {\"tp\": 29.944444444444443, \"fp\": 0.0, \"fn\": 0.05555555555555558, \"score_sum\": 0.0, \"count\": 1, \"precision\": 1.0, \"recall\": 0.998148, \"f1\": 0.999073, \"mean_score\": 0.0}}",
+      "decision": "ACCEPTED",
+      "decision_reason": "val F1 0.9865 vs incumbent 0.9865; aggregate 0.9627",
+      "created_at": 1792318907.7622669
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 5,
+      "candidate_id": "c5_0",
+      "parent_id": "c5_0",
+      "mutation_type": "llm_directive_edit",
+      "target_subtree": "$.age_groups",
+      "hypothesis": "The model is likely misaligning objects by using content-based matching (like team name) rather than strict positional matching, or it is failing to map multi-column rows to single objects correctly, causing index shifts that result in array_item_mismatch even when values appear similar. Enforcing strict positional row-to-object mapping prevents content-based reordering or dropping.",
+      "train_f1": 0.9674669967978858,
+      "val_f1": null,
+      "subtree_scores_json": "{}",
+      "decision": "REJECTED_STAGE1",
+      "decision_reason": "train F1 0.9675 < incumbent 0.9931 - 0.02",
+      "created_at": 1792323668.05712
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "iteration": 5,
+      "candidate_id": "c5_1",
+      "parent_id": "c5_0",
+      "mutation_type": "llm_checklist_edit",
+      "target_subtree": "verification_checklist",
+      "hypothesis": "A structured verification checklist forces the model to explicitly count and verify index alignment before finalizing the output, catching off-by-one errors or dropped rows caused by empty fields in the source table.",
+      "train_f1": 0.9674669967978858,
+      "val_f1": null,
+      "subtree_scores_json": "{}",
+      "decision": "REJECTED_STAGE1",
+      "decision_reason": "train F1 0.9675 < incumbent 0.9931 - 0.02",
+      "created_at": 1792323959.029871
+    }
+  ],
+  "archive": [
+    {
+      "run_id": "swimming-srpbo-v1",
+      "candidate_id": "c5_0",
+      "val_f1": 0.9927758395883991,
+      "aggregate_f1": 0.964737,
+      "created_at": 1792323294.242608,
+      "subtree": {
+        "$": {
+          "tp": 211.94444444444446,
+          "fp": 2.0,
+          "fn": 1.0555555555555556,
+          "score_sum": 0.0,
+          "count": 13,
+          "precision": 0.990652,
+          "recall": 0.995044,
+          "f1": 0.992843,
+          "mean_score": 0.0
+        },
+        "$.championship": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details": {
+          "tp": 5.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 3,
+          "precision": 1.0,
+          "recall": 0.833333,
+          "f1": 0.909091,
+          "mean_score": 0.0
+        },
+        "$.event_details.sex": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details.length": {
+          "tp": 1.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.666667,
+          "mean_score": 0.0
+        },
+        "$.event_details.category": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups": {
+          "tp": 204.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 9,
+          "precision": 0.990336,
+          "recall": 0.999729,
+          "f1": 0.99501,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*]": {
+          "tp": 204.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 8,
+          "precision": 0.990336,
+          "recall": 0.999729,
+          "f1": 0.99501,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].age_group": {
+          "tp": 7.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results": {
+          "tp": 197.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 7,
+          "precision": 0.989997,
+          "recall": 0.999719,
+          "f1": 0.994835,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*]": {
+          "tp": 197.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 7,
+          "precision": 0.989997,
+          "recall": 0.999719,
+          "f1": 0.994835,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].rank": {
+          "tp": 33.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].time": {
+          "tp": 33.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].records": {
+          "tp": 0.0,
+          "fp": 2.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details": {
+          "tp": 131.94444444444446,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 4,
+          "precision": 1.0,
+          "recall": 0.999579,
+          "f1": 0.99979,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.athlete": {
+          "tp": 33.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.country": {
+          "tp": 33.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.year_birth": {
+          "tp": 33.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.team": {
+          "tp": 32.94444444444444,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.998316,
+          "f1": 0.999158,
+          "mean_score": 0.0
+        }
+      }
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "candidate_id": "c4_0",
+      "val_f1": 0.9865344426168283,
+      "aggregate_f1": 0.9626714999999999,
+      "created_at": 1792318479.085804,
+      "subtree": {
+        "$": {
+          "tp": 193.94444444444446,
+          "fp": 2.0,
+          "fn": 4.055555555555555,
+          "score_sum": 0.0,
+          "count": 14,
+          "precision": 0.989793,
+          "recall": 0.979517,
+          "f1": 0.984628,
+          "mean_score": 0.0
+        },
+        "$.championship": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details": {
+          "tp": 5.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 3,
+          "precision": 1.0,
+          "recall": 0.833333,
+          "f1": 0.909091,
+          "mean_score": 0.0
+        },
+        "$.event_details.sex": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details.length": {
+          "tp": 1.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.666667,
+          "mean_score": 0.0
+        },
+        "$.event_details.category": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups": {
+          "tp": 186.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 10,
+          "precision": 0.989415,
+          "recall": 0.983918,
+          "f1": 0.986659,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*]": {
+          "tp": 186.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 9,
+          "precision": 0.989415,
+          "recall": 0.983918,
+          "f1": 0.986659,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].age_group": {
+          "tp": 7.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results": {
+          "tp": 179.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 8,
+          "precision": 0.989008,
+          "recall": 0.983303,
+          "f1": 0.986147,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*]": {
+          "tp": 179.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 7,
+          "precision": 0.989008,
+          "recall": 0.999691,
+          "f1": 0.994321,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].rank": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].time": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].records": {
+          "tp": 0.0,
+          "fp": 2.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details": {
+          "tp": 119.94444444444444,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 4,
+          "precision": 1.0,
+          "recall": 0.999537,
+          "f1": 0.999768,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.athlete": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.country": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.year_birth": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.team": {
+          "tp": 29.944444444444443,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.998148,
+          "f1": 0.999073,
+          "mean_score": 0.0
+        }
+      }
+    },
+    {
+      "run_id": "swimming-srpbo-v1",
+      "candidate_id": "c4_1",
+      "val_f1": 0.9865344426168283,
+      "aggregate_f1": 0.9626714999999999,
+      "created_at": 1792318907.761905,
+      "subtree": {
+        "$": {
+          "tp": 193.94444444444446,
+          "fp": 2.0,
+          "fn": 4.055555555555555,
+          "score_sum": 0.0,
+          "count": 14,
+          "precision": 0.989793,
+          "recall": 0.979517,
+          "f1": 0.984628,
+          "mean_score": 0.0
+        },
+        "$.championship": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details": {
+          "tp": 5.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 3,
+          "precision": 1.0,
+          "recall": 0.833333,
+          "f1": 0.909091,
+          "mean_score": 0.0
+        },
+        "$.event_details.sex": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.event_details.length": {
+          "tp": 1.0,
+          "fp": 0.0,
+          "fn": 1.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.666667,
+          "mean_score": 0.0
+        },
+        "$.event_details.category": {
+          "tp": 2.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups": {
+          "tp": 186.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 10,
+          "precision": 0.989415,
+          "recall": 0.983918,
+          "f1": 0.986659,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*]": {
+          "tp": 186.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 9,
+          "precision": 0.989415,
+          "recall": 0.983918,
+          "f1": 0.986659,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].age_group": {
+          "tp": 7.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results": {
+          "tp": 179.94444444444446,
+          "fp": 2.0,
+          "fn": 3.0555555555555554,
+          "score_sum": 0.0,
+          "count": 8,
+          "precision": 0.989008,
+          "recall": 0.983303,
+          "f1": 0.986147,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*]": {
+          "tp": 179.94444444444446,
+          "fp": 2.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 7,
+          "precision": 0.989008,
+          "recall": 0.999691,
+          "f1": 0.994321,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].rank": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].time": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].records": {
+          "tp": 0.0,
+          "fp": 2.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details": {
+          "tp": 119.94444444444444,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 4,
+          "precision": 1.0,
+          "recall": 0.999537,
+          "f1": 0.999768,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.athlete": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.country": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.year_birth": {
+          "tp": 30.0,
+          "fp": 0.0,
+          "fn": 0.0,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_score": 0.0
+        },
+        "$.age_groups[*].results[*].athlete_details.team": {
+          "tp": 29.944444444444443,
+          "fp": 0.0,
+          "fn": 0.05555555555555558,
+          "score_sum": 0.0,
+          "count": 1,
+          "precision": 1.0,
+          "recall": 0.998148,
+          "f1": 0.999073,
+          "mean_score": 0.0
+        }
+      }
+    }
+  ],
+  "llm_stats": [
+    {
+      "role": "extractor",
+      "model": "groq/openai/gpt-oss-120b",
+      "n": 37,
+      "it": 72587,
+      "ot": 89161,
+      "lat_ms": 34637.54054054054
+    },
+    {
+      "role": "extractor",
+      "model": "groq/qwen/qwen3.8-27b",
+      "n": 33,
+      "it": 67166,
+      "ot": 45742,
+      "lat_ms": 121629.33333333333
+    },
+    {
+      "role": "mutator",
+      "model": "groq/openai/gpt-oss-120b",
+      "n": 8,
+      "it": 7015,
+      "ot": 4246,
+      "lat_ms": 89882.875
+    },
+    {
+      "role": "mutator",
+      "model": "groq/qwen/qwen3.8-27b",
+      "n": 5,
+      "it": 4893,
+      "ot": 2549,
+      "lat_ms": 121875.6
+    }
+  ],
+  "n_cached_predictions": 68
+}

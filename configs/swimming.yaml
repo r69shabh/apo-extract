@@ -1,0 +1,64 @@
+run_id: swimming-srpbo-v1
+seed: 42
+
+dataset:
+  name: sport/swimming
+  root_dir: data/extract-bench
+  schema_path: data/extract-bench/dataset/sport/swimming/swimming-schema.json
+  documents_glob: data/extract-bench/dataset/sport/swimming/pdf+gold/*.pdf
+  gold_dir: data/extract-bench/dataset/sport/swimming/pdf+gold
+  split_policy:
+    seed: 42
+    train_ratio: 0.30
+    val_ratio: 0.40
+    test_ratio: 0.30
+
+scoring:
+  engine: extract_bench_compliant          # or "your.module:factory"
+  primary_metric: overall_micro_f1
+  array_alignment_policy: hungarian_plus_llm_cache
+  number_default_tolerance: 0.001
+  semantic_match_threshold: 0.70
+  judge_model: groq/qwen/qwen3.8-27b  # gpt-oss-120b TPD (200k/day) exhausted 15:00; switched mid-run
+  enable_llm_judge: false
+  cache_path: runs/cache/scoring_cache.sqlite
+
+llms:
+  extractor:
+    provider: groq
+    model: qwen/qwen3.8-27b  # text-only provider; table PDFs carry their rows as text
+    temperature: 0.0
+    max_output_tokens: 3000  # full result tables need ~2k out; input ~1.6k + 3k < 8k TPM
+    pdf_mode: text
+  optimizer_mutator:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    temperature: 1.0
+    max_output_tokens: 2000  # mutator prompts are the largest; keep input+max under 8k TPM
+  scoring_judge:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    temperature: 0.0
+    max_output_tokens: 1000
+
+seed_prompt:
+  path: configs/prompts/seed_generic_extraction.txt
+
+budget:
+  max_iterations: 12
+  max_cost_usd: 8.0
+  max_total_tokens: 4000000
+  max_wall_clock_seconds: 3600
+
+optimizer:
+  strategy: subtree_pareto_beam
+  beam_width: 3
+  candidates_per_iteration: 2
+  min_val_improvement: 0.005
+  stage1_max_train_regression: 0.02
+  pareto_aggregate_tolerance: 0.03
+  stall_patience: 2
+  duplicate_similarity: 0.92
+  enable_subtree_rollback: true
+  extraction_mode: single_call
+  chunk_threshold_fields: 60
