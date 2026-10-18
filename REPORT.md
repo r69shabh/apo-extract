@@ -1,154 +1,168 @@
 # REPORT — Automated Prompt Optimization for Structured Extraction (ExtractBench)
 
-Status: implementation complete and fully validated offline. **Live Gemini
-evaluation numbers are pending a run with `GEMINI_API_KEY`** (see Run commands);
-all reported-in-code claims below are verified by the offline test suite.
+`apo-extract` optimizes a single extraction prompt (`PromptArtifact`: global
+preamble, formatting/null policy, per-subtree directives, verification checklist)
+against the vendored ExtractBench benchmark. Loop: subtree×error-type diagnosis →
+LLM mutation candidates → stage-1 train gate → validation → Pareto archive over
+(val micro-F1, macro-subtree F1, tie band 0.03) → rollback; test split scored once,
+at the end, for the best artifact only. Two live runs completed; two remain staged
+but blocked on credits (see Limitations). All artifacts (`summary.json`,
+`report.md`, ledger DB, best artifact, per-document test evidence) are under
+`runs/<id>/final/`.
 
-## 1. Methodology
+**Run conditions** (the numbers below are only meaningful under these):
 
-- **Prompt representation**: `PromptArtifact` = global preamble, formatting/null
-  policy, per-top-level-property `subtree_directives` (`$.field`), verification
-  checklist. Mutations are additive, surgical, and versioned (`artifact_id`,
-  `parent_ids`, `generation`); `hash()` identifies prompt versions across caches.
-- **Scoring**: `ExtractBenchCompliantScorer` uses the vendored extract-bench
-  metric registry with published evaluation configs/presets. Per-node P/R/F1
-  attribution: absent-gold/absent-pred = TN (excluded); gold absent, pred present
-  = FP; pred absent (gold present) = FN; both present = TP = score, FN += 1 − score.
-  Arrays use deterministic Hungarian alignment (soft-F1 by default; the upstream
-  LLM-judge policy is selectable). LLM-judge metrics are disk-cached.
-- **Diagnosis**: failures clustered by (top-level subtree × error type); cluster
-  weight = count × (1 + (1 − subtree F1)); highest-weight cluster is targeted.
-- **Optimization (SR-PBO)**: each iteration proposes k candidate mutations against
-  the incumbent (LLM mutator when configured; deterministic templates otherwise),
-  applies stage-1 filtering (train regression cap 0.02), evaluates survivors on
-  validation, and maintains a Pareto archive over (val micro-F1, macro-subtree F1)
-  with discretized tie bands (0.03). Tabu list + per-target delta dedup prevent
-  cycling; crossover merges complementary front directives; a rollback pass reverts
-  subtrees that regressed > 0.05 while global score improved. Stops on stall
-  patience or budget (iterations/tokens/USD/wall-clock). Test split is scored once,
-  at the end, for the best artifact only.
-- **Reproducibility**: seeded shuffle split; all prompts, predictions, scores,
-  hypotheses and LLM payloads persisted under `runs/<id>/`; resume reuses cached
-  (prompt, PDF, model) predictions and completed iterations.
+- **hiring/resume** (7 docs; train 3 / val 2 / test 2): iterations on
+  `gemini-3.5-flash`→`gemini-3.5-flash-lite` (free tiers), finalize + seed
+  re-measure on `openrouter/google/gemini-2.5-flash-lite`, `pdf_mode: images`;
+  judge = same model; 5 of 12 iterations (stall); rollback off.
+- **sport/swimming** (train 2 / val 2 / test 1): iterations on `gpt-oss-120b` →
+  `qwen/qwen3.8-27b` (Groq 200k TPD exhausted mid-run; caches are model-keyed, so
+  the archive was re-scored after the switch); finalize + seed re-measure on
+  `qwen/qwen3.8-27b`, `pdf_mode: text`; judge = same model; 5 of 12 iterations
+  (stall patience 2); rollback on.
 
-## 2. Experimental setup
+## 1. Test-set scores (seed vs final)
 
-- Datasets (as published, unmodified): hiring/resume (7 docs), finance/
-  credit_agreement (10), academic/research (9), sport/swimming (N as shipped) —
-  schemas and `pdf+gold` triplets under `data/extract-bench/dataset/`.
-- Splits: seeded 30/40/30 with `max()` floors (e.g. resume: train 3 / val 2 / test 2).
-- Models: extractor `gemini-3.8-flash` (temperature 0); judge metrics
-  `gemini/gemini-3.8-flash` via `scoring.judge_model`; mutator LLM optional.
-- Budgets per `configs/*.yaml`: 12 iterations, caps in tokens/USD/time.
+| Run | Test docs | Seed test F1 | Final test F1 | Δ (micro) | Seed→final macro-F1 |
+|---|---|---|---|---|---|
+| hiring/resume | 2 | 0.7157 | **0.7221** | +0.0064 | 0.7138 → 0.5340 |
+| sport/swimming | 1 | 1.0000 | **1.0000** | +0.0000 | 1.0000 → 1.0000 |
 
-## 3. Offline verification (done)
+Per-subtree test F1 (seed → final), top-level subtrees from the merged
+per-document evidence:
 
-| Check | Result |
-|---|---|
-| Gold-vs-gold scoring, all 5 shipped schemas, real evaluation configs | F1 = 1.000 (with deterministic leaf-metric overrides) |
-| JSON-unparseable prediction | recall 0, `json_valid=false`, whole-doc omission cluster |
-| Array item dropped / invented | FN = 1 / FP = 1 exactly; item-level P/R |
-| Ambiguous array alignment | Tier-2 judge refinement only in 0.30 < s < 0.85 band |
-| Repeat scoring determinism | identical results across runs (incl. cached judges) |
-| Splitter | seeded, reproducible, disjoint, blueprint N=5/6/7/10 allocation |
-| Optimizer dry run (directive-dependent mock, real resume dataset) | learns missing directive; val F1 1.0; crossover accepted; hypotheses logged |
-| Crash + resume (KeyboardInterrupt mid-iteration 2, then resume) | zero re-extractions of cached (prompt, PDF) pairs; run completes |
-| Subtree rollback | regressed subtrees reverted to parent directive; skips below threshold |
-| `dry-run` CLI (gold-as-prediction) with production scorer wiring | test F1 = 1.0000 |
-| Full test suite | 68 tests, all green |
-| Retry hardening (429 log, bounded attempts, fail-fast on daily-quota delays) | covered by `tests/test_cli_retry.py` |
-| Unknown error-kind template fallback | covered by `tests/test_proposer_templates.py` |
-| Text-mode PDF ingestion for non-vision providers (`pdf_mode: text`) | covered by `tests/test_client_attachments.py` |
+**hiring/resume**
 
-## 4. Live results
+| Subtree | Seed | Final | Δ |
+|---|---|---|---|
+| $.certificationsAndAwards | 0.537 | 0.824 | **+0.287** |
+| $.socialLinks | 1.000 | 1.000 | +0.000 |
+| $.skills | 0.000 | 0.000 | +0.000 |
+| $.personalInfo | 0.956 | 0.898 | −0.058 |
+| $.workExperience | 0.780 | 0.698 | −0.081 |
+| $.education | 0.933 | 0.636 | −0.296 |
+| $.other | 0.390 | 0.000 | −0.390 |
+| $.publications | 0.619 | 0.000 | −0.619 |
+| $.media | 0.909 | 0.000 | −0.909 |
+| $.languages | 1.000 | 0.000 | −1.000 |
 
-From `runs/<id>/final/summary.json` + `report.md`. Run with e.g.:
+**sport/swimming**
+
+| Subtree | Seed | Final | Δ |
+|---|---|---|---|
+| $.age_groups | 1.000 | 1.000 | +0.000 |
+| $.championship | 1.000 | 1.000 | +0.000 |
+| $.event_details | 1.000 | 1.000 | +0.000 |
+
+Read the resume table with care: the micro gain is real but concentrated
+(`$.certificationsAndAwards`); the collapses are mostly subtrees with 0–2 test
+instances (e.g. `$.languages` is one sparse field), and the val split shows the
+intended repair the test split does not (`$.skills` 0 → 0.714 on val). Defensible
+claim: the run improved one field family and did not degrade the aggregate micro
+metric; per-subtree test deltas on 2 documents are noise-dominated.
+
+Swimming note: both arms are at the ceiling on the single test document
+(re-measured with the final 3000-token output cap). The run's own finalize,
+executed mid-run under a transient 1200-token cap, scored both arms 0.9636 —
+those misses were output truncation, not extraction errors. `summary.json` keeps
+the finalize pass as `finalize_test_f1` and the re-measured pair as
+`test_f1`/`seed_test_f1`; this table uses the pair.
+
+## 2. Prompt diff (seed → final)
+
+Both winners differ from the seed **only in one subtree directive**; preamble,
+formatting policy, checklist and all other directives are byte-identical to seed.
+
+**hiring/resume** — final = seed + this `$.workExperience` directive
+(5 accepted mutations total; the directive accumulated through the run):
+
+> For the `category` field, strictly output null unless the document explicitly
+> contains a designated category tag associated with the work entry; do not use
+> section headers or headings as category values.
+> For array fields, extract one entry per real item and copy each entry's values
+> exactly as written. Do not merge two items into one, split one item into
+> several, reorder, or drop entries that do not match an example.
+
+Trigger: diagnosis clustered 6 array_item_mismatch failures on
+Resume-Academic02 / Resume-Legal (val F1 0.7264 → 0.7316, aggregate 0.7777 → 0.7843).
+
+**sport/swimming** — final = seed + this `$.age_groups` directive (65 → 391 bytes):
+
+> CRITICAL: For the 'results' array, ensure strict 1:1 mapping between each row
+> in the document table and an object in the array. Do not skip rows where
+> specific attributes (like 'records') are missing in the source; instead,
+> represent missing data as null (e.g., "records": null) to maintain array
+> length and index alignment.
+
+Note: several accepted swimming candidates edited the preamble/checklist
+(iterations 1–4); the Pareto winner is the **directive-only** variant (val 0.9928
+vs 0.9722 for the best checklist variant), so those edits are not in the final
+prompt. "Accepted" means "admitted to the front", not "kept".
+
+## 3. Notable accepted mutations
+
+**hiring/resume** (val F1 = 0.7264 seed baseline):
+
+| It. | Candidate | Mutation | Target | Val F1 | Hypothesis (mutator) / outcome |
+|---|---|---|---|---|---|
+| 1 | c1_0 | directive_array_item_mismatch | $.workExperience | 0.7511 | Add array-item guidance to fix 6 observed failures (Resume-Academic02, Resume-Legal); accepted (+0.025) |
+| 2 | c2_0 | directive_array_item_mismatch | $.workExperience | 0.7511 | Refinement of the same rule; accepted (tie) |
+| 3 | c3_0 | directive_array_item_mismatch | $.workExperience | 0.7316 | Third refinement; accepted as **final best** (tie band + aggregate 0.7843) |
+| 4 | c4_0 | directive_array_item_mismatch | $.certificationsAndAwards | — | Add guidance for 4 observed failures; rejected stage-1 (train regression) |
+| 5 | c5_0 | directive_array_item_mismatch | $.certificationsAndAwards | — | Same target; rejected stage-1 |
+
+**sport/swimming** (val F1 = 0.9865 seed baseline, model qwen):
+
+| It. | Candidate | Mutation | Target | Val F1 | Hypothesis (mutator) / outcome |
+|---|---|---|---|---|---|
+| 1 | c1_0 | llm_preamble_edit | global_preamble | 0.8835 | Replace placeholder rank values ("NA") with null, eliminating rank mismatches; accepted to front |
+| 1 | c1_1 | llm_checklist_edit | verification_checklist | 0.9393 | Explicit checklist reminder reinforces placeholder→null rule; accepted |
+| 3 | c3_1 | llm_checklist_edit | verification_checklist | 0.9722 | Checklist reminder, second refinement; accepted |
+| 4 | c4_0 | llm_directive_edit | $.age_groups | 0.9865 | 1:1 row↔object mapping to stop dropped/extra rows in results tables; accepted |
+| 4 | c4_1 | llm_checklist_edit | verification_checklist | 0.9865 | Array-length consistency check; accepted |
+| 5 | c5_0 | llm_directive_edit | $.age_groups | **0.9928** | Strict 1:1 mapping with nulls for missing attributes; accepted as **final best** |
+
+(Swimming iteration-2/3 proposals were rejected as dominated; the run stopped at
+iteration 5 by stall patience 2. The public ledger for `c5_0` shows a rejected
+re-proposal row — a replay artifact of mid-run rate-limit kills, fixed forward;
+the accepted original is in the archive and is `best_candidate_id`.)
+
+## 4. Limitations (as implemented)
+
+- **Held-out splits are tiny** (test: 1–2 docs). Per-subtree and macro test
+  deltas are variance-dominated; the val split is the more informative signal,
+  and even it is 2 docs. Do not read resume's macro collapse (or swimming's ±0)
+  as a property of the directives.
+- **Free-tier constraints shaped both runs**: mid-run model switches (both runs),
+  8k-TPM request sizing (`max_output_tokens` 3000/2000/1000), one truncation
+  incident (swimming finalize), and model-keyed caches meaning a switch re-scores
+  the archive — val values from different iterations are approximately, not
+  exactly, comparable.
+- **Two of four dataset runs are missing**: finance/credit_agreement (10 docs,
+  42–130k tokens/doc) and academic/research (9 docs, 4–218k tokens/doc) exceed
+  Groq free-tier context and need ~$0.8–1.2 of OpenRouter credits (configs and
+  driver staged: `configs/*.yaml`, `runs/autopilot.sh`). Large-document schemas
+  are the untested regime.
+- **"Accepted" ≠ "in final prompt"**: the Pareto winner retains a subset of
+  accepted edits (see §2 swimming note). Cost accounting is token-estimated for
+  the resume run (≈$0.03 actual on OpenRouter light tier, 326k tokens).
+- **Scoring noise**: semantic/array fields go through an LLM judge (disk-cached,
+  model-keyed); judge model changes re-judge. Rollback operates at top-level
+  subtree granularity only.
+- **Operational**: resume has no config-hash validation (documented staging
+  hazard); the ledger replay artifact above (fixed in `_run_iteration`, tests in
+  `tests/test_resume_replay.py`); the mutator LLM path has only these two live
+  runs of track record.
+
+## Reproduce
 
 ```bash
-source ~/.zshrc  # GEMINI_API_KEY / OPENROUTER_API_KEY
-uv run apo-extract run -c configs/hiring_resume.yaml
-# repeat for configs/finance_credit_agreement.yaml, configs/academic_research.yaml, configs/swimming.yaml
+source ~/.zshrc  # GROQ_API_KEY / GEMINI_API_KEY / OPENROUTER_API_KEY
+uv run apo-extract run -c configs/swimming.yaml       # free tier, ~5 iterations
+uv run apo-extract run -c configs/hiring_resume.yaml  # needs OpenRouter credits
+uv run apo-extract export-web -c configs/swimming.yaml  # frontend snapshot
 ```
 
-| Dataset | Seed artifact (test F1) | Optimized (test F1) | Δ | Iterations accepted | Cost (USD) |
-|---|---|---|---|---|---|
-| hiring/resume | 0.7157 | 0.7221 | +0.0064 | 3 | 0.44 (est. tokens; ≈$0.03 actual, OpenRouter) |
-| finance/credit_agreement | pending | pending | | | |
-| academic/research | pending | pending | | | |
-| sport/swimming | 1.0000 | 1.0000 | +0.0000 | 5 | 0.00 (Groq free tier; 283k tokens) |
-
-Runs 3–4 (`finance/credit_agreement`, `academic/research`) are fully staged
-(`configs/*.yaml` wired to `openrouter/google/gemini-2.5-flash-lite`, JPEG
-page-image ingestion for the 97–218-page PDFs, sequential driver at
-`runs/autopilot.sh`) but remain blocked on account credits: the OpenRouter
-account is free-tier with its trial allowance exhausted, and Gemini's direct
-free-tier daily caps (~20 requests/day) cannot cover a full run. Estimated cost
-to unblock both: ~$0.8–1.2. Run 2 (sport/swimming) fit inside Groq's free tier
-and completed.
-
-Per-run analysis (subtree deltas, accepted hypotheses, rollback events) is
-auto-generated in `runs/<id>/report.md`.
-
-Run-1 (hiring/resume) methodology notes — deviations forced by free-tier caps:
-
-- Iterations 1–5 ran on `gemini-3.5-flash` → `gemini-3.5-flash-lite` (paid-tier
-  daily quotas exhausted mid-run; exact model per iteration is in
-  `runs/resume-srpbo-v1/llm_calls.jsonl`).
-- The held-out finalize (val re-eval + test) ran on
-  `openrouter/google/gemini-2.5-flash-lite` (same family) with page-image PDF
-  ingestion (`pdf_mode: images`) and judge `openrouter/google/gemini-2.5-flash-lite`;
-  the seed's test F1 above was measured under identical conditions for a fair Δ.
-- NVIDIA NIM (`z-ai/glm-5.3-flash`) was tried as a no-quota fallback and rejected:
-  serial extraction-size call took 568 s and returned empty content.
-- Budget: `max_iterations` 5 (shipped default 12); subtree rollback disabled for the
-  resume run (resume-time staging to skip a doomed iteration; see config comments).
-- Test macro subtree F1 moved 0.7138 → 0.5340: the accepted `$.workExperience`
-  directive fixed `$.skills` (0 → 0.71) but test-split `$.other` collapsed on 2 docs
-  (val `$.other` did too: 0.62 → 0.0) — tiny test set, treat macro deltas as noisy.
-
-Run-2 (sport/swimming) methodology notes — constraints from Groq's free tier:
-
-- Groq's per-model daily cap is 200k tokens: `gpt-oss-120b` ran iterations 1–4
-  then hit TPD (199,196/200,000 — "try again in ~10m" rolling recovery). All
-  three roles were switched to `qwen/qwen3.8-27b` (fresh daily bucket) at
-  iteration 4; the archive was re-scored because prediction/judge caches are
-  model-keyed. Val F1 trajectory mixes both models (0.88 → 0.94 → 0.97 → 0.99);
-  the finalize passes (val re-eval + test for seed and best) ran on qwen only,
-  and the seed's test F1 above was measured under identical conditions.
-- Groq caps input + `max_tokens` at 8k tokens (TPM) per request;
-  `max_output_tokens` are set to 3000 (extractor) / 2000 (mutator) / 1000
-  (judge). A transiently lower 1200-token extractor cap (mid-run rate-limit
-  tuning) truncated one test document during the finalize — see the ceiling
-  bullet below. One empty generation (Groq `json_validate_failed`) killed the
-  run once before this was treated as transient by the bounded retry wrapper
-  (`src/apo_extract/cli.py`).
-- The run converged early: stall patience 2 stopped it at iteration 5 of 12
-  (5 candidates accepted; best c5_0, val F1 0.9928, mutated directive 65 → 391
-  bytes).
-- Ceiling effect: the test split is a single document and the seed already
-  extracts it perfectly — both arms score test F1 1.0000 when re-measured with
-  a full 3000-token output cap. (The run's own finalize, executed under the
-  free-tier 1200-token cap set mid-run, scored both arms 0.9636: the misses
-  were output truncation, not extraction errors. `summary.json` keeps that
-  finalize pass as `finalize_test_f1` and the identically-measured pair as
-  `test_f1`/`seed_test_f1`; the table above uses the pair.) Accepted
-  directives moved val (0.88 → 0.99), not test.
-- Cost: $0.00 (Groq free tier), 283k tokens spent.
-- Resume replay artifact: mid-run rate-limit kills left iteration 5 half-recorded;
-  a resumed attempt re-rolled its slots and overwrote the `c5_0` ledger row with
-  a rejected re-proposal (train F1 0.9675 < gate). The accepted original stayed
-  in the archive and is the `best_candidate_id` in `summary.json` (val 0.9928),
-  so the iteration ledger understates `c5_0` — read its row as the re-proposal.
-  Fixed forward in `_run_iteration` (replay now fills only unrecorded slots and
-  skips fully-recorded iterations; `tests/test_resume_replay.py`), so the
-  remaining runs won't hit this.
-
-## 5. Limitations & future work
-
-- LLM-judge leaf metrics make scoring cost scale with string-field count; the disk
-  cache mitigates repeats across candidates but not the first full pass.
-- Validation sets are tiny (2 docs on resume) — variance is real; the archive's
-  aggregate-F1 dimension and train gate reduce overfitting to val noise.
-- Rollback operates on top-level subtrees only (matches directive granularity).
-- The mutator LLM path is implemented but exercised only against mocked responses;
-  live-run hypothesis quality is part of the pending evaluation.
+Per-run analysis (full ledger, hypotheses, subtree deltas) is auto-generated in
+`runs/<id>/report.md`. Offline checks: 72 tests green (`uv run pytest`).
